@@ -130,7 +130,7 @@ namespace Etupirka
 				//Console.Write(result);
 				string matchTitle = "<div id=\"soft-title\"><span class=\"bold\">(?<title>.*?)</span>";
 				string matchBrand = "<td><a href=\"brand.php\\?brand=(?<brandid>.*?)\">(?<brand>.*?)</a></td>";
-				string matchSaleDay = "<td><a href=\"toukei_hatubaibi_month.php\\?.*\">(?<saleday>.*?)</a></td>";
+				string matchSaleDay = "<td><a href=\"toukei_hatubaibi.php\\?.*\">(?<saleday>.*?)</a></td>";
 
 				Regex re = new Regex(matchTitle, RegexOptions.IgnoreCase);
 				for (Match m = re.Match(result); m.Success; m = m.NextMatch())
