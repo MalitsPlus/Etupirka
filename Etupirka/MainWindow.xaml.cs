@@ -38,136 +38,112 @@ using Etupirka.Properties;
 
 namespace Etupirka
 {
-	public enum StatusBarStatus
-	{
-		watching = 0, resting = 1, erogehelper = 2
-	}
+    public enum StatusBarStatus
+    {
+        watching = 0, resting = 1, erogehelper = 2
+    }
 
-	/// <summary>
-	/// Interaction logic for MainWindow.xaml
-	/// </summary>
-	public partial class MainWindow : MetroWindow, INotifyPropertyChanged
-	{
-		#region Property
-		public event PropertyChangedEventHandler PropertyChanged;
-		protected void OnPropertyChanged(string name)
-		{
-			if (PropertyChanged == null) return;
-			PropertyChanged(this, new PropertyChangedEventArgs(name));
-		}
+    /// <summary>
+    /// Interaction logic for MainWindow.xaml
+    /// </summary>
+    public partial class MainWindow : MetroWindow, INotifyPropertyChanged
+    {
+        #region Property
+        public event PropertyChangedEventHandler PropertyChanged;
+        protected void OnPropertyChanged(string name) {
+            if (PropertyChanged == null) return;
+            PropertyChanged(this, new PropertyChangedEventArgs(name));
+        }
 
-		public int ItemCount
-		{
-			get
-			{
-				if (items == null)
-				{
-					return 0;
-				}
-				return items.Count;
-			}
-		}
+        public int ItemCount {
+            get {
+                if (items == null) {
+                    return 0;
+                }
+                return items.Count;
+            }
+        }
 
-		public string TotalTime
-		{
-			get
-			{
-				if (items == null) return "";
-				int t = 0;
-				foreach (GameExecutionInfo i in items)
-				{
-					t += i.TotalPlayTime;
-				}
-				return t / 3600 + @"時間" + (t / 60) % 60 + @"分";
-			}
-		}
+        public string TotalTime {
+            get {
+                if (items == null) return "";
+                int t = 0;
+                foreach (GameExecutionInfo i in items) {
+                    t += i.TotalPlayTime;
+                }
+                return t / 3600 + @"時間" + (t / 60) % 60 + @"分";
+            }
+        }
 
-		public bool WatchProc
-		{
-			get
-			{
-				return Properties.Settings.Default.watchProcess;
-			}
-			set
-			{
-				Properties.Settings.Default.watchProcess = value;
+        public bool WatchProc {
+            get {
+                return Properties.Settings.Default.watchProcess;
+            }
+            set {
+                Properties.Settings.Default.watchProcess = value;
 
-				OnPropertyChanged("WatchProc");
-				OnPropertyChanged("StatusBarStat");
-			}
-		}
+                OnPropertyChanged("WatchProc");
+                OnPropertyChanged("StatusBarStat");
+            }
+        }
 
 
-		bool erogeHelper=false;
-		public bool ErogeHelper
-		{
-			get
-			{
-				return erogeHelper;
-			}
-			set
-			{
+        bool erogeHelper = false;
+        public bool ErogeHelper {
+            get {
+                return erogeHelper;
+            }
+            set {
 
-				if (!value)
-				{
-					GameListView.Visibility = Visibility.Visible;
-					MenuBar.Visibility = Visibility.Visible;
-					this.ShowTitleBar = true;
+                if (!value) {
+                    GameListView.Visibility = Visibility.Visible;
+                    MenuBar.Visibility = Visibility.Visible;
+                    this.ShowTitleBar = true;
 
-				}
-				else
-				{
-					GameListView.Visibility = Visibility.Hidden;
-					MenuBar.Visibility = Visibility.Hidden;
-					this.ShowTitleBar = false;
-				}
+                } else {
+                    GameListView.Visibility = Visibility.Hidden;
+                    MenuBar.Visibility = Visibility.Hidden;
+                    this.ShowTitleBar = false;
+                }
 
-				erogeHelper = value;
-				OnPropertyChanged("ErogeHelper");
-				OnPropertyChanged("StatusBarStat");
-			}
-		}
+                erogeHelper = value;
+                OnPropertyChanged("ErogeHelper");
+                OnPropertyChanged("StatusBarStat");
+            }
+        }
 
 
-		public StatusBarStatus StatusBarStat
-		{
-			get
-			{
-				if (ErogeHelper) return StatusBarStatus.erogehelper;
-				if (WatchProc) return StatusBarStatus.watching;
-				return StatusBarStatus.resting;
-			}
-		}
+        public StatusBarStatus StatusBarStat {
+            get {
+                if (ErogeHelper) return StatusBarStatus.erogehelper;
+                if (WatchProc) return StatusBarStatus.watching;
+                return StatusBarStatus.resting;
+            }
+        }
 
-		#endregion
+        #endregion
 
-		#region Hotkey
-		private HotKey _hotkey;
-		private void OnHotKeyHandler_WatchProc(HotKey hotKey)
-		{
-			if (Properties.Settings.Default.playVoice)
-			{
-				if (WatchProc)
-				{
-					SoundPlayer sp = new SoundPlayer(Properties.Resources.stop2);
-					sp.Play();
-				}
-				else
-				{
-					SoundPlayer sp = new SoundPlayer(Properties.Resources.start2);
-					sp.Play();
+        #region Hotkey
+        private HotKey _hotkey;
+        private void OnHotKeyHandler_WatchProc(HotKey hotKey) {
+            if (Properties.Settings.Default.playVoice) {
+                if (WatchProc) {
+                    SoundPlayer sp = new SoundPlayer(Properties.Resources.stop2);
+                    sp.Play();
+                } else {
+                    SoundPlayer sp = new SoundPlayer(Properties.Resources.start2);
+                    sp.Play();
 
-				}
-			}
-			WatchProc = !WatchProc;
-		}
+                }
+            }
+            WatchProc = !WatchProc;
+        }
 
-		private void OnHotKeyHandler_ErogeHelper(HotKey hotKey)
-		{
-			ErogeHelper = !ErogeHelper;
-		}
+        private void OnHotKeyHandler_ErogeHelper(HotKey hotKey) {
+            ErogeHelper = !ErogeHelper;
+        }
 
-		/*		private void OnHotKeyHandler_Screenshot(HotKey hotKey)
+        /*		private void OnHotKeyHandler_Screenshot(HotKey hotKey)
 				{
 					System.Drawing.Rectangle bounds = this.Bounds;
 					using (Bitmap bitmap = new Bitmap(bounds.Width, bounds.Height))
@@ -179,108 +155,95 @@ namespace Etupirka
 						bitmap.Save("C://test.jpg", ImageFormat.Jpeg);
 					}
 				}*/
-		#endregion
-		
-		private ObservableCollection<GameExecutionInfo> items;
-		
-		//private Dictionary<string, TimeData> timeDict;
+        #endregion
 
-		private System.Windows.Threading.DispatcherTimer watchProcTimer;
+        private ObservableCollection<GameExecutionInfo> items;
 
-		private DBManager db;
-		
+        //private Dictionary<string, TimeData> timeDict;
 
+        private System.Windows.Threading.DispatcherTimer watchProcTimer;
+
+        private DBManager db;
 
 
-		public MainWindow()
-		{
 
-			if (Settings.Default.UpgradeRequired)
-			{
-				Settings.Default.Upgrade();
-				Settings.Default.UpgradeRequired = false;
-				Settings.Default.Save();
-			}
 
-			InitializeComponent();
-			tbico.DoubleClickCommand = new ShowAppCommand(this);
-			tbico.DataContext = this;
+        public MainWindow() {
 
-			if (Settings.Default.Do_minimize)
-			{
-				this.Hide();
-				Settings.Default.Do_minimize = false;
-				Settings.Default.Save();
-			}
+            if (Settings.Default.UpgradeRequired) {
+                Settings.Default.Upgrade();
+                Settings.Default.UpgradeRequired = false;
+                Settings.Default.Save();
+            }
 
-			db = new DBManager(Utility.userDBPath);
-			Utility.im = new InformationManager(Utility.infoDBPath);
+            InitializeComponent();
+            tbico.DoubleClickCommand = new ShowAppCommand(this);
+            tbico.DataContext = this;
 
-			items = new ObservableCollection<GameExecutionInfo>();
-			db.LoadGame(items);
+            if (Settings.Default.Do_minimize) {
+                this.Hide();
+                Settings.Default.Do_minimize = false;
+                Settings.Default.Save();
+            }
 
-			GameListView.ItemsSource = items;
-			GameListView.SelectedItem = null;
-			UpdateStatus();
-			OnPropertyChanged("ItemCount");
+            db = new DBManager(Utility.userDBPath);
+            Utility.im = new InformationManager(Utility.infoDBPath);
 
-			_hotkey = new HotKey(Key.F9, KeyModifier.Alt, OnHotKeyHandler_WatchProc);
-			_hotkey = new HotKey(Key.F8, KeyModifier.Alt, OnHotKeyHandler_ErogeHelper);
+            items = new ObservableCollection<GameExecutionInfo>();
+            db.LoadGame(items);
 
-			RegisterInStartup(Properties.Settings.Default.setStartUp);
-			if (Properties.Settings.Default.disableGlowBrush)
-			{
-				this.GlowBrush = null;
-			}
+            GameListView.ItemsSource = items;
+            GameListView.SelectedItem = null;
+            UpdateStatus();
+            OnPropertyChanged("ItemCount");
 
-			watchProcTimer = new System.Windows.Threading.DispatcherTimer();
-			watchProcTimer.Tick += new EventHandler(dispatcherTimer_Tick);
-			watchProcTimer.Interval = new TimeSpan(0, 0, Properties.Settings.Default.monitorInterval);
-			watchProcTimer.Start();
+            _hotkey = new HotKey(Key.F9, KeyModifier.Alt, OnHotKeyHandler_WatchProc);
+            _hotkey = new HotKey(Key.F8, KeyModifier.Alt, OnHotKeyHandler_ErogeHelper);
 
-			if (Settings.Default.checkUpdate)
-			{
-				Thread t = new Thread(doCheckUpdate);
-				t.Start();
-			}
+            RegisterInStartup(Properties.Settings.Default.setStartUp);
+            if (Properties.Settings.Default.disableGlowBrush) {
+                this.GlowBrush = null;
+            }
+
+            watchProcTimer = new System.Windows.Threading.DispatcherTimer();
+            watchProcTimer.Tick += new EventHandler(dispatcherTimer_Tick);
+            watchProcTimer.Interval = new TimeSpan(0, 0, Properties.Settings.Default.monitorInterval);
+            watchProcTimer.Start();
+
+            if (Settings.Default.checkUpdate) {
+                Thread t = new Thread(doCheckUpdate);
+                t.Start();
+            }
         }
 
-		#region Function
-		private  void doCheckUpdate()
-		{
-			try
-			{
-				string str = NetworkUtility.GetString("http://etupirka.halcyons.org/checkversion.php");
-				Version lastestVersion = new Version(str);
-				Version myVersion = new Version(FileVersionInfo.GetVersionInfo(System.Reflection.Assembly.GetExecutingAssembly().Location).FileVersion);
-				if (lastestVersion > myVersion)
-				{
-					if (MessageBox.Show("Version " + str + " が見つかりました、更新しますか？", "Etupirkaを更新する", MessageBoxButton.YesNo) == MessageBoxResult.Yes)
-					{
-						Process.Start("https://github.com/Aixile/Etupirka/releases");
-					}
-				}
-			}catch
-			{
+        #region Function
+        private void doCheckUpdate() {
+            try {
+                string str = NetworkUtility.GetString("http://etupirka.halcyons.org/checkversion.php");
+                Version lastestVersion = new Version(str);
+                Version myVersion = new Version(FileVersionInfo.GetVersionInfo(System.Reflection.Assembly.GetExecutingAssembly().Location).FileVersion);
+                if (lastestVersion > myVersion) {
+                    if (MessageBox.Show("Version " + str + " が見つかりました、更新しますか？", "Etupirkaを更新する", MessageBoxButton.YesNo) == MessageBoxResult.Yes) {
+                        Process.Start("https://github.com/Aixile/Etupirka/releases");
+                    }
+                }
+            } catch {
 
-			}
+            }
 
-		}
+        }
 
-		private void UpdateStatus(int time=0)
-		{
-			IntPtr actWin = Utility.GetForegroundWindow();
-			int calcID;
-			Utility.GetWindowThreadProcessId(actWin, out calcID);
+        private void UpdateStatus(int time = 0) {
+            IntPtr actWin = Utility.GetForegroundWindow();
+            int calcID;
+            Utility.GetWindowThreadProcessId(actWin, out calcID);
             var currentProc = Process.GetProcessById(calcID);
-            try
-            {
+            try {
                 if (System.IO.Path.GetFileName(currentProc.MainModule.FileName) == "main.bin") //SoftDenchi DRM
                 {
                     calcID = Utility.ParentProcessUtilities.GetParentProcess(calcID).Id;
                 }
-            }
-            catch(Exception e) {
+            } catch (Exception e) {
                 Console.WriteLine(e);
             }
 
@@ -288,27 +251,19 @@ namespace Etupirka
             bool play_flag = false;
 
             this.Dispatcher.BeginInvoke(
-             new Action(() =>
-             {
-             Process[] proc = Process.GetProcesses();
+             new Action(() => {
+                 Process[] proc = Process.GetProcesses();
 
-             Dictionary<String, bool> dic = new Dictionary<string, bool>();
-                 foreach (Process p in proc)
-                 {
-                     try
-                     {
+                 Dictionary<String, bool> dic = new Dictionary<string, bool>();
+                 foreach (Process p in proc) {
+                     try {
                          string path = p.MainModule.FileName.ToLower();
-                         if (dic.ContainsKey(path))
-                         {
+                         if (dic.ContainsKey(path)) {
                              dic[path] |= p.Id == calcID;
-                         }
-                         else
-                         {
+                         } else {
                              dic.Add(p.MainModule.FileName.ToLower(), p.Id == calcID);
                          }
-                     }
-                     catch (Exception e)
-                     {
+                     } catch (Exception e) {
                          Console.WriteLine(e);
                      }
                  }
@@ -316,44 +271,37 @@ namespace Etupirka
                  string statusBarText = "";
                  string trayTipText = "Etupirka Version " + FileVersionInfo.GetVersionInfo(System.Reflection.Assembly.GetExecutingAssembly().Location).FileVersion;
 
-                 foreach (GameExecutionInfo i in items)
-                 {
+                 foreach (GameExecutionInfo i in items) {
                      bool running = false;
                      if (i.UpdateStatus2(dic, ref running, time))
                      // if (i.UpdateStatus(proc, calcID,ref running, time))
                      {
-                         if (time != 0)
-                         {
+                         if (time != 0) {
                              //string date = DateTime.Now.Date.ToString("yyyy-MM-dd");
 
                              db.UpdateTimeNow(i.UID, time);
                          }
                          db.UpdateGameTimeInfo(i.UID, i.TotalPlayTime, i.FirstPlayTime, i.LastPlayTime);
-                         if (i.Status == ProcStat.Focused)
-                         {
+                         if (i.Status == ProcStat.Focused) {
                              play_flag = true;
                              PlayMessage.Content = i.Title + " : " + i.TotalPlayTimeString;
 
-                             if (Properties.Settings.Default.hideListWhenPlaying)
-                             {
+                             if (Properties.Settings.Default.hideListWhenPlaying) {
                                  ErogeHelper = true;
                              }
                          }
                      }
                      System.Console.WriteLine(running);
-                     if (running)
-                     {
+                     if (running) {
                          trayTipText += "\n" + i.Title + " : " + i.TotalPlayTimeString;
                      }
                  }
 
                  dic.Clear();
-                 if (!play_flag)
-                 {
+                 if (!play_flag) {
                      PlayMessage.Content = statusBarText;
 
-                     if (Properties.Settings.Default.hideListWhenPlaying)
-                     {
+                     if (Properties.Settings.Default.hideListWhenPlaying) {
                          ErogeHelper = false;
                      }
                  }
@@ -363,48 +311,34 @@ namespace Etupirka
              }));
         }
 
-        private void RegisterInStartup(bool isChecked)
-        {
-            try
-            {
+        private void RegisterInStartup(bool isChecked) {
+            try {
                 RegistryKey registryKey = Registry.CurrentUser.OpenSubKey
                         ("SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run", true);
-                if (isChecked)
-                {
-                    if (Settings.Default.minimizeAtStartup)
-                    {
+                if (isChecked) {
+                    if (Settings.Default.minimizeAtStartup) {
                         registryKey.SetValue("Etupirka", "\"" + System.Reflection.Assembly.GetEntryAssembly().Location + "\" -min");
 
-                    }
-                    else
-                    {
+                    } else {
                         registryKey.SetValue("Etupirka", System.Reflection.Assembly.GetEntryAssembly().Location);
                     }
-                }
-                else
-                {
+                } else {
                     registryKey.DeleteValue("Etupirka");
                 }
-            }
-            catch
-            {
+            } catch {
 
             }
         }
 
-        void ImportXML(string dataPath)
-        {
+        void ImportXML(string dataPath) {
             GameExecutionInfo[] erogeList = null;
             System.Xml.Serialization.XmlSerializer serializer2 = new System.Xml.Serialization.XmlSerializer(typeof(GameExecutionInfo[]));
             System.IO.StreamReader sr = new System.IO.StreamReader(dataPath);
             erogeList = (GameExecutionInfo[])serializer2.Deserialize(sr);
             sr.Close();
-            if (erogeList != null)
-            {
-                foreach (GameExecutionInfo i in erogeList)
-                {
-                    if (i.UID == null)
-                    {
+            if (erogeList != null) {
+                foreach (GameExecutionInfo i in erogeList) {
+                    if (i.UID == null) {
                         i.GenerateUID();
                     }
                     items.Add(i);
@@ -415,19 +349,15 @@ namespace Etupirka
             OnPropertyChanged("ItemCount");
         }
 
-        void ImportXML_Overwrite(string dataPath)
-        {
+        void ImportXML_Overwrite(string dataPath) {
             GameExecutionInfo[] erogeList = null;
             System.Xml.Serialization.XmlSerializer serializer2 = new System.Xml.Serialization.XmlSerializer(typeof(GameExecutionInfo[]));
             System.IO.StreamReader sr = new System.IO.StreamReader(dataPath);
             erogeList = (GameExecutionInfo[])serializer2.Deserialize(sr);
             sr.Close();
-            if (erogeList != null)
-            {
-                foreach (GameExecutionInfo i in erogeList)
-                {
-                    if (i.UID == null)
-                    {
+            if (erogeList != null) {
+                foreach (GameExecutionInfo i in erogeList) {
+                    if (i.UID == null) {
                         i.GenerateUID();
                     }
                     items.Add(i);
@@ -438,34 +368,28 @@ namespace Etupirka
             OnPropertyChanged("ItemCount");
         }
 
-        public void ExportXML(string dataPath)
-        {
+        public void ExportXML(string dataPath) {
             System.Xml.Serialization.XmlSerializer serializer = new System.Xml.Serialization.XmlSerializer(typeof(GameExecutionInfo[]));
             System.IO.StreamWriter sw = new System.IO.StreamWriter(dataPath, false);
             serializer.Serialize(sw, items.ToArray());
             sw.Close();
         }
 
-        void ExportXML(string dataPath, List<GameExecutionInfo> a)
-        {
+        void ExportXML(string dataPath, List<GameExecutionInfo> a) {
             System.Xml.Serialization.XmlSerializer serializer = new System.Xml.Serialization.XmlSerializer(typeof(GameExecutionInfo[]));
             System.IO.StreamWriter sw = new System.IO.StreamWriter(dataPath, false);
             serializer.Serialize(sw, a.ToArray());
             sw.Close();
         }
 
-        void ImportTimeDict(string dataPath)
-        {
+        void ImportTimeDict(string dataPath) {
             Dictionary<string, TimeData> timeDict = new Dictionary<string, TimeData>();
-            try
-            {
+            try {
                 XElement xElem = XElement.Load(dataPath);
                 timeDict = xElem.Descendants("day").ToDictionary(
                     x => ((string)x.Attribute("d")).Replace('/', '-'), x => new TimeData(x.Descendants("game").ToDictionary(
                           y => (string)y.Attribute("uid"), y => (int)y.Attribute("value"))));
-            }
-            catch
-            {
+            } catch {
                 timeDict = new Dictionary<string, TimeData>();
             }
 
@@ -473,18 +397,14 @@ namespace Etupirka
 
         }
 
-        void ImportTimeDict_Overwrite(string dataPath)
-        {
+        void ImportTimeDict_Overwrite(string dataPath) {
             Dictionary<string, TimeData> timeDict = new Dictionary<string, TimeData>();
-            try
-            {
+            try {
                 XElement xElem = XElement.Load(dataPath);
                 timeDict = xElem.Descendants("day").ToDictionary(
                     x => ((string)x.Attribute("d")).Replace('/', '-'), x => new TimeData(x.Descendants("game").ToDictionary(
                          y => (string)y.Attribute("uid"), y => (int)y.Attribute("value"))));
-            }
-            catch
-            {
+            } catch {
                 timeDict = new Dictionary<string, TimeData>();
             }
 
@@ -493,8 +413,7 @@ namespace Etupirka
 
 
 
-        void ExportTimeDict(string dataPath)
-        {
+        void ExportTimeDict(string dataPath) {
             Dictionary<string, TimeData> timeDict = db.GetPlayTime();
 
             XElement xElem = new XElement("days",
@@ -508,8 +427,7 @@ namespace Etupirka
             xElem.Save(dataPath);
         }
 
-        void ExportTimeDict(string dataPath, List<GameExecutionInfo> a)
-        {
+        void ExportTimeDict(string dataPath, List<GameExecutionInfo> a) {
             Dictionary<string, TimeData> timeDict = db.GetPlayTime(a);
 
             XElement xElem = new XElement("days",
@@ -526,30 +444,23 @@ namespace Etupirka
 
         #region Event
 
-        protected override void OnClosing(System.ComponentModel.CancelEventArgs e)
-        {
+        protected override void OnClosing(System.ComponentModel.CancelEventArgs e) {
             //StreamWriter writer=new StreamWriter(@"D:\etupirka.log", true);
             //writer.WriteLine("test");
             e.Cancel = false;
-            if (Settings.Default.askBeforeExit)
-            {
-                try
-                {
+            if (Settings.Default.askBeforeExit) {
+                try {
                     Dialog.AskExitDialog acd = new Dialog.AskExitDialog();
                     acd.Owner = this;
                     e.Cancel = true;
-                    if (acd.ShowDialog() == true)
-                    {
+                    if (acd.ShowDialog() == true) {
                         e.Cancel = false;
-                        if (acd.DoNotDisplay)
-                        {
+                        if (acd.DoNotDisplay) {
                             Settings.Default.askBeforeExit = false;
                             Settings.Default.Save();
                         }
                     }
-                }
-                catch
-                {
+                } catch {
                 }
 
             }
@@ -557,22 +468,17 @@ namespace Etupirka
             base.OnClosing(e);
         }
 
-        private void GameListView_KeyDown(object sender, KeyEventArgs e)
-        {
-            if (e.Key == Key.Enter)
-            {
+        private void GameListView_KeyDown(object sender, KeyEventArgs e) {
+            if (e.Key == Key.Enter) {
                 DoOpenGame();
-            }
-            else if (e.Key == Key.Delete)
-            {
+            } else if (e.Key == Key.Delete) {
 
                 DoDelete();
             }
 
         }
 
-        protected override void OnStateChanged(EventArgs e)
-        {
+        protected override void OnStateChanged(EventArgs e) {
             if (WindowState == System.Windows.WindowState.Minimized)
                 this.Hide();
 
@@ -580,15 +486,12 @@ namespace Etupirka
         }
 
 
-        private void doUpdate()
-        {
+        private void doUpdate() {
             UpdateStatus(Properties.Settings.Default.monitorInterval);
         }
 
-        private void dispatcherTimer_Tick(object sender, EventArgs e)
-        {
-            if (Properties.Settings.Default.watchProcess)
-            {
+        private void dispatcherTimer_Tick(object sender, EventArgs e) {
+            if (Properties.Settings.Default.watchProcess) {
                 Thread t = new Thread(doUpdate);
                 t.Start();
 
@@ -596,17 +499,14 @@ namespace Etupirka
             //	UpdateStatus(Properties.Settings.Default.monitorInterval);
         }
 
-        private void MetroWindow_Deactivated(object sender, EventArgs e)
-        {
+        private void MetroWindow_Deactivated(object sender, EventArgs e) {
             GameListView.UnselectAll();
         }
 
-        private void GameListView_MouseDoubleClick(object sender, MouseButtonEventArgs e)
-        {
+        private void GameListView_MouseDoubleClick(object sender, MouseButtonEventArgs e) {
             var listView = (ListView)sender;
             var item = listView.ContainerFromElement((DependencyObject)e.OriginalSource) as ListViewItem;
-            if (item != null)
-            {
+            if (item != null) {
                 GameExecutionInfo g = (GameExecutionInfo)GameListView.SelectedItem;
                 if (g != null) g.run();
             }
@@ -618,12 +518,10 @@ namespace Etupirka
         #endregion
 
         #region MenuRegion
-        private void AddGameFromESID_Click(object sender, RoutedEventArgs e)
-        {
+        private void AddGameFromESID_Click(object sender, RoutedEventArgs e) {
             Dialogs.AddGameFromESIDDialog ad = new Dialogs.AddGameFromESIDDialog();
             ad.Owner = this;
-            if (ad.ShowDialog() == true)
-            {
+            if (ad.ShowDialog() == true) {
                 GameExecutionInfo i = new GameExecutionInfo(ad.Value);
                 items.Add(i);
                 db.InsertOrReplaceGame(i);
@@ -633,12 +531,10 @@ namespace Etupirka
             }
 
         }
-        private void AddGameFromProcess_Click(object sender, RoutedEventArgs e)
-        {
+        private void AddGameFromProcess_Click(object sender, RoutedEventArgs e) {
             Dialog.ProcessDialog pd = new Dialog.ProcessDialog();
             pd.Owner = this;
-            if (pd.ShowDialog() == true)
-            {
+            if (pd.ShowDialog() == true) {
                 GameExecutionInfo i = new GameExecutionInfo(pd.SelectedProc.ProcTitle, pd.SelectedProc.ProcPath);
                 items.Add(i);
                 db.InsertOrReplaceGame(i);
@@ -648,24 +544,20 @@ namespace Etupirka
             }
         }
 
-        private void SettingButton_Click(object sender, RoutedEventArgs e)
-        {
+        private void SettingButton_Click(object sender, RoutedEventArgs e) {
             Dialogs.GlobalSettingDialog gd = new Dialogs.GlobalSettingDialog();
             gd.Owner = this;
             int mi = Properties.Settings.Default.monitorInterval;
             bool watchProc = Properties.Settings.Default.watchProcess;
-            if (gd.ShowDialog() == true)
-            {
+            if (gd.ShowDialog() == true) {
                 GameListView.Items.Refresh();
                 RegisterInStartup(Properties.Settings.Default.setStartUp);
                 bool watchProc_a = Properties.Settings.Default.watchProcess;
-                if (watchProc != watchProc_a)
-                {
+                if (watchProc != watchProc_a) {
                     WatchProc = watchProc_a;
                 }
 
-                if (mi != Properties.Settings.Default.monitorInterval)
-                {
+                if (mi != Properties.Settings.Default.monitorInterval) {
                     watchProcTimer.Stop();
                     watchProcTimer.Interval = new TimeSpan(0, 0, Properties.Settings.Default.monitorInterval);
                     watchProcTimer.Start();
@@ -673,77 +565,64 @@ namespace Etupirka
             }
         }
 
-        private void ImportList_Click(object sender, RoutedEventArgs e)
-        {
+        private void ImportList_Click(object sender, RoutedEventArgs e) {
             OpenFileDialog openFileDialog1 = new OpenFileDialog();
             openFileDialog1.Multiselect = false;
             openFileDialog1.Filter = "Etupirka GameData XMLFile(*.xml)|*.xml";
             openFileDialog1.FilterIndex = 1;
-            if (openFileDialog1.ShowDialog() == true)
-            {
+            if (openFileDialog1.ShowDialog() == true) {
                 ImportXML(openFileDialog1.FileName);
             }
         }
 
-        private void ImportList_Overwrite_Click(object sender, RoutedEventArgs e)
-        {
+        private void ImportList_Overwrite_Click(object sender, RoutedEventArgs e) {
             OpenFileDialog openFileDialog1 = new OpenFileDialog();
             openFileDialog1.Multiselect = false;
             openFileDialog1.Filter = "Etupirka GameData XMLFile(*.xml)|*.xml";
             openFileDialog1.FilterIndex = 1;
-            if (openFileDialog1.ShowDialog() == true)
-            {
+            if (openFileDialog1.ShowDialog() == true) {
                 ImportXML_Overwrite(openFileDialog1.FileName);
             }
         }
 
-        private void ImportPlayTimeList_Click(object sender, RoutedEventArgs e)
-        {
+        private void ImportPlayTimeList_Click(object sender, RoutedEventArgs e) {
             OpenFileDialog openFileDialog1 = new OpenFileDialog();
             openFileDialog1.Multiselect = false;
             openFileDialog1.Filter = "Etupirka PlayTimeData XMLFile(*.xml)|*.xml";
             openFileDialog1.FilterIndex = 1;
-            if (openFileDialog1.ShowDialog() == true)
-            {
+            if (openFileDialog1.ShowDialog() == true) {
                 ImportTimeDict(openFileDialog1.FileName);
             }
         }
 
-        private void ImportPlayTimeList_Overwrite_Click(object sender, RoutedEventArgs e)
-        {
+        private void ImportPlayTimeList_Overwrite_Click(object sender, RoutedEventArgs e) {
             OpenFileDialog openFileDialog1 = new OpenFileDialog();
             openFileDialog1.Multiselect = false;
             openFileDialog1.Filter = "Etupirka PlayTimeData XMLFile(*.xml)|*.xml";
             openFileDialog1.FilterIndex = 1;
-            if (openFileDialog1.ShowDialog() == true)
-            {
+            if (openFileDialog1.ShowDialog() == true) {
                 ImportTimeDict_Overwrite(openFileDialog1.FileName);
             }
         }
 
-        private void ExportList_Click(object sender, RoutedEventArgs e)
-        {
+        private void ExportList_Click(object sender, RoutedEventArgs e) {
             SaveFileDialog openFileDialog1 = new SaveFileDialog();
             openFileDialog1.Filter = "ErogeTimerXMLFile(*.xml)|*.xml";
             openFileDialog1.FilterIndex = 1;
-            if (openFileDialog1.ShowDialog() == true)
-            {
+            if (openFileDialog1.ShowDialog() == true) {
                 ExportXML(openFileDialog1.FileName);
                 ExportTimeDict(System.IO.Path.ChangeExtension(openFileDialog1.FileName, ".time.xml"));
             }
         }
 
-        private void ExportSelect_Click(object sender, RoutedEventArgs e)
-        {
+        private void ExportSelect_Click(object sender, RoutedEventArgs e) {
             SaveFileDialog openFileDialog1 = new SaveFileDialog();
             openFileDialog1.Filter = "ErogeTimerXMLFile(*.xml)|*.xml";
             openFileDialog1.FilterIndex = 1;
             List<GameExecutionInfo> t = GameListView.SelectedItems.Cast<GameExecutionInfo>().ToList();
-            if (openFileDialog1.ShowDialog() == true)
-            {
+            if (openFileDialog1.ShowDialog() == true) {
 
-                foreach (GameExecutionInfo i in t)
-                {
+                foreach (GameExecutionInfo i in t) {
                     GameListView.SelectedItems.Add(i);
                 }
                 ExportXML(openFileDialog1.FileName, t);
@@ -785,18 +664,13 @@ namespace Etupirka
                     }
                 }*/
 
-        private void PlayTimeStatistic_Click(object sender, RoutedEventArgs e)
-        {
-            try
-            {
+        private void PlayTimeStatistic_Click(object sender, RoutedEventArgs e) {
+            try {
                 Dialog.PlayTimeStatisticDialog pd = new Dialog.PlayTimeStatisticDialog(Utility.userDBPath);
                 pd.Owner = this;
-                if (pd.ShowDialog() == true)
-                {
+                if (pd.ShowDialog() == true) {
                 }
-            }
-            catch (Exception a)
-            {
+            } catch (Exception a) {
                 MessageBox.Show(a.Message);
             }
 
@@ -807,11 +681,9 @@ namespace Etupirka
                 return NetworkUtility.GetData(url);  
             }
             */
-        private async void UpdateOfflineDatabase_Click(object sender, RoutedEventArgs e)
-        {
+        private async void UpdateOfflineDatabase_Click(object sender, RoutedEventArgs e) {
 
-            try
-            {
+            try {
                 var controller = await this.ShowProgressAsync("更新しています", "Initializing...");
                 controller.SetCancelable(true);
                 await TaskEx.Delay(1000);
@@ -819,15 +691,13 @@ namespace Etupirka
                 controller.SetMessage("Downloading...");
                 string url = Properties.Settings.Default.databaseSyncServer;
                 url = url.TrimEnd('/') + "/" + "esdata.gz";
-                if (controller.IsCanceled)
-                {
+                if (controller.IsCanceled) {
                     await controller.CloseAsync();
                     await this.ShowMessageAsync("データベースを更新する", "失敗しました");
                     return;
                 }
                 var data = await TaskEx.Run(() => { return NetworkUtility.GetData(url); });
-                if (controller.IsCanceled)
-                {
+                if (controller.IsCanceled) {
                     await controller.CloseAsync();
                     await this.ShowMessageAsync("データベースを更新する", "失敗しました");
                     return;
@@ -835,8 +705,7 @@ namespace Etupirka
 
                 controller.SetMessage("Decompressing...");
                 var s = await TaskEx.Run(() => { return Encoding.UTF8.GetString(Utility.Decompress(data)); });
-                if (controller.IsCanceled)
-                {
+                if (controller.IsCanceled) {
                     await controller.CloseAsync();
                     await this.ShowMessageAsync("データベースを更新する", "失敗しました");
                     return;
@@ -845,41 +714,32 @@ namespace Etupirka
                 controller.SetMessage("Updating database...");
                 bool re = await TaskEx.Run(() => { return Utility.im.update(s.Split('\n')); });
                 await controller.CloseAsync();
-                if (re)
-                {
+                if (re) {
                     await this.ShowMessageAsync("データベースを更新する", "成功しました");
-                }
-                else
-                {
+                } else {
                     await this.ShowMessageAsync("データベースを更新する", "失敗しました");
                 }
-            }
-            catch
-            {
+            } catch {
                 return;
             }
         }
 
-        private void QuitApp_Click(object sender, RoutedEventArgs e)
-        {
+        private void QuitApp_Click(object sender, RoutedEventArgs e) {
             Application.Current.Shutdown();
         }
 
-        private async void showMessage(string title, string str)
-        {
+        private async void showMessage(string title, string str) {
             MessageDialogResult re = await this.ShowMessageAsync(title, str);
 
         }
-        private void VersionInfo_Click(object sender, RoutedEventArgs e)
-        {
+        private void VersionInfo_Click(object sender, RoutedEventArgs e) {
 
             showMessage("バージョン情報", "Version " + FileVersionInfo.GetVersionInfo(System.Reflection.Assembly.GetExecutingAssembly().Location).FileVersion +
                 " By Aixile (@namaniku0).");
 
         }
 
-        private void CheckUpdate_Click(object sender, RoutedEventArgs e)
-        {
+        private void CheckUpdate_Click(object sender, RoutedEventArgs e) {
             Thread t = new Thread(doCheckUpdate);
             t.Start();
         }
@@ -888,65 +748,52 @@ namespace Etupirka
         #endregion
 
         #region ContextMenuRegion
-        private void GameProperty_Click(object sender, RoutedEventArgs e)
-        {
-            if (GameListView.SelectedItems.Count > 0)
-            {
+        private void GameProperty_Click(object sender, RoutedEventArgs e) {
+            if (GameListView.SelectedItems.Count > 0) {
                 GameExecutionInfo i = (GameExecutionInfo)GameListView.SelectedItem;
                 Dialog.GamePropertyDialog gd = new Dialog.GamePropertyDialog(i);
                 gd.Owner = this;
-                if (gd.ShowDialog() == true)
-                {
+                if (gd.ShowDialog() == true) {
                     UpdateStatus();
                     db.UpdateGameInfoAndExec(i);
                 }
             }
         }
 
-        private void TimeSetting_Click(object sender, RoutedEventArgs e)
-        {
-            if (GameListView.SelectedItems.Count > 0)
-            {
+        private void TimeSetting_Click(object sender, RoutedEventArgs e) {
+            if (GameListView.SelectedItems.Count > 0) {
                 GameExecutionInfo i = (GameExecutionInfo)GameListView.SelectedItem;
                 Dialog.TimeSettingDialog td = new Dialog.TimeSettingDialog(i);
 
                 td.Owner = this;
-                if (td.ShowDialog() == true)
-                {
+                if (td.ShowDialog() == true) {
                     UpdateStatus();
                     db.UpdateGameTimeInfo(i.UID, i.TotalPlayTime, i.FirstPlayTime, i.LastPlayTime);
                 }
             }
         }
 
-        private void OpenPlayStatistics_Click(object sender, RoutedEventArgs e)
-        {
-            if (GameListView.SelectedItems.Count > 0)
-            {
+        private void OpenPlayStatistics_Click(object sender, RoutedEventArgs e) {
+            if (GameListView.SelectedItems.Count > 0) {
                 GameExecutionInfo i = (GameExecutionInfo)GameListView.SelectedItem;
                 List<TimeSummary> t = db.QueryGamePlayTime(i.UID);
                 Dialog.GameTimeStatisticDialog td = new Dialog.GameTimeStatisticDialog(t);
 
                 td.Owner = this;
-                if (td.ShowDialog() == true)
-                {
+                if (td.ShowDialog() == true) {
                 }
             }
         }
 
-        private async void DoDelete()
-        {
+        private async void DoDelete() {
             ArrayList a = new ArrayList(GameListView.SelectedItems);
-            if (a.Count != 0)
-            {
+            if (a.Count != 0) {
                 MessageDialogResult re = await this.ShowMessageAsync("本当に削除しますか？", "", MessageDialogStyle.AffirmativeAndNegative);
-                if (re != MessageDialogResult.Affirmative)
-                {
+                if (re != MessageDialogResult.Affirmative) {
                     return;
                 }
             }
-            foreach (GameExecutionInfo i in a)
-            {
+            foreach (GameExecutionInfo i in a) {
                 db.DeleteGame(i.UID);
                 (GameListView.ItemsSource as ObservableCollection<GameExecutionInfo>).Remove(i);
             }
@@ -954,82 +801,65 @@ namespace Etupirka
             OnPropertyChanged("ItemCount");
         }
 
-        private void Delete_Click(object sender, RoutedEventArgs e)
-        {
+        private void Delete_Click(object sender, RoutedEventArgs e) {
             DoDelete();
         }
 
-        private void DoOpenGame()
-        {
+        private void DoOpenGame() {
             GameExecutionInfo g = (GameExecutionInfo)GameListView.SelectedItem;
             if (g != null) g.run();
             UpdateStatus();
         }
 
-        private void OpenGame_Click(object sender, RoutedEventArgs e)
-        {
+        private void OpenGame_Click(object sender, RoutedEventArgs e) {
             DoOpenGame();
         }
 
-        private void OpenFolder_Click(object sender, RoutedEventArgs e)
-        {
-            if (GameListView.SelectedItems.Count > 0)
-            {
-                try
-                {
+        private void OpenFolder_Click(object sender, RoutedEventArgs e) {
+            if (GameListView.SelectedItems.Count > 0) {
+                try {
                     GameExecutionInfo i = (GameExecutionInfo)GameListView.SelectedItem;
                     Process.Start(System.IO.Path.GetDirectoryName(i.ExecPath));
-                }
-                catch
-                {
+                } catch {
 
                 }
             }
         }
 
-        private void ShowApp_Click(object sender, RoutedEventArgs e)
-        {
+        private void ShowApp_Click(object sender, RoutedEventArgs e) {
             this.Show();
             this.WindowState = WindowState.Normal;
         }
 
-        private void OpenES_Click(object sender, RoutedEventArgs e)
-        {
+        private void OpenES_Click(object sender, RoutedEventArgs e) {
             GameExecutionInfo g = (GameExecutionInfo)GameListView.SelectedItem;
-            if (g != null && g.ErogameScapeID != 0)
-            {
+            if (g != null && g.ErogameScapeID != 0) {
                 System.Diagnostics.Process.Start("http://erogamescape.dyndns.org/~ap2/ero/toukei_kaiseki/game.php?game=" + g.ErogameScapeID);
             }
         }
 
-        private void CopyTitle_Click(object sender, RoutedEventArgs e)
-        {
+        private void CopyTitle_Click(object sender, RoutedEventArgs e) {
             GameExecutionInfo g = (GameExecutionInfo)GameListView.SelectedItem;
-            if (g != null)
-            {
+            if (g != null) {
                 Clipboard.SetText(g.Title);
             }
 
         }
 
-        private void CopyBrand_Click(object sender, RoutedEventArgs e)
-        {
+        private void CopyBrand_Click(object sender, RoutedEventArgs e) {
             GameExecutionInfo g = (GameExecutionInfo)GameListView.SelectedItem;
-            if (g != null)
-            {
+            if (g != null) {
                 Clipboard.SetText(g.Brand);
             }
         }
 
-        private void TryGetGameInfo_Click(object sender, RoutedEventArgs e)
-        {
+        private void TryGetGameInfo_Click(object sender, RoutedEventArgs e) {
             List<GameInfo> allGames = Utility.im.getAllEsInfo();
             GameExecutionInfo g = (GameExecutionInfo)GameListView.SelectedItem;
             Dictionary<GameInfo, int> dic = new Dictionary<GameInfo, int>();
             string title = g.Title;
 
-            foreach (GameInfo i in allGames)
-            {
+            foreach (GameInfo i in allGames) {
                 int dist = StringProcessing.LevenshteinDistance(title, i.Title);
                 dic[i] = dist;
             }
@@ -1041,16 +871,14 @@ namespace Etupirka
             //g.SaleDay = ans.SaleDay;
 
             List<GameInfo> ans_l = new List<GameInfo>();
-            for (int i = 0; i < 50; i++)
-            {
+            for (int i = 0; i < 50; i++) {
                 ans_l.Add(ordered.ElementAt(i).Key);
             }
 
             Dialog.GameInfoDialog td = new Dialog.GameInfoDialog(ans_l);
 
             td.Owner = this;
-            if (td.ShowDialog() == true)
-            {
+            if (td.ShowDialog() == true) {
                 g.ErogameScapeID = td.SelectedGameInfo.ErogameScapeID;
                 g.Title = td.SelectedGameInfo.Title;
                 g.Brand = td.SelectedGameInfo.Brand;
@@ -1069,22 +897,18 @@ namespace Etupirka
     public class ShowAppCommand : ICommand
     {
         MainWindow m;
-        public ShowAppCommand(MainWindow _m)
-        {
+        public ShowAppCommand(MainWindow _m) {
             m = _m;
         }
 
-        public void Execute(object parameter)
-        {
-            if (m != null)
-            {
+        public void Execute(object parameter) {
+            if (m != null) {
                 m.Show();
                 m.WindowState = WindowState.Normal;
             }
         }
 
-        public bool CanExecute(object parameter)
-        {
+        public bool CanExecute(object parameter) {
             return true;
         }
         public event EventHandler CanExecuteChanged;
@@ -1095,16 +919,14 @@ namespace Etupirka
 
     public class IndexConverter : IValueConverter
     {
-        public object Convert(object value, Type TargetType, object parameter, CultureInfo culture)
-        {
+        public object Convert(object value, Type TargetType, object parameter, CultureInfo culture) {
             var item = (ListViewItem)value;
             var listView = ItemsControl.ItemsControlFromItemContainer(item) as ListView;
             int index = listView.ItemContainerGenerator.IndexFromContainer(item) + 1;
             return index.ToString();
         }
 
-        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
-        {
+        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture) {
             throw new NotImplementedException();
         }
     }
@@ -1112,21 +934,16 @@ namespace Etupirka
     public class PathStyleConverter : IValueConverter
     {
         public object Convert(object value, Type targetType, object parameter,
-            System.Globalization.CultureInfo culture)
-        {
-            if (Properties.Settings.Default.differExecuatableGame && !(bool)value)
-            {
+            System.Globalization.CultureInfo culture) {
+            if (Properties.Settings.Default.differExecuatableGame && !(bool)value) {
                 return "#808080";
-            }
-            else
-            {
+            } else {
                 return "#FFFFFF";
             }
         }
 
         public object ConvertBack(object value, Type targetType, object parameter,
-            System.Globalization.CultureInfo culture)
-        {
+            System.Globalization.CultureInfo culture) {
             throw new NotSupportedException();
         }
     }
@@ -1134,10 +951,8 @@ namespace Etupirka
     public class StatusStyleConverter : IValueConverter
     {
         public object Convert(object value, Type targetType, object parameter,
-            System.Globalization.CultureInfo culture)
-        {
-            switch ((ProcStat)value)
-            {
+            System.Globalization.CultureInfo culture) {
+            switch ((ProcStat)value) {
                 case ProcStat.NotExist:
                     return "#808080";
                 case ProcStat.Rest:
@@ -1152,8 +967,7 @@ namespace Etupirka
         }
 
         public object ConvertBack(object value, Type targetType, object parameter,
-            System.Globalization.CultureInfo culture)
-        {
+            System.Globalization.CultureInfo culture) {
             throw new NotSupportedException();
         }
     }
@@ -1161,25 +975,18 @@ namespace Etupirka
     public class StatusBarStyleConverter : IValueConverter
     {
         public object Convert(object value, Type targetType, object parameter,
-            System.Globalization.CultureInfo culture)
-        {
-            if ((StatusBarStatus)value == StatusBarStatus.watching)
-            {
+            System.Globalization.CultureInfo culture) {
+            if ((StatusBarStatus)value == StatusBarStatus.watching) {
                 return "#1585b5";
-            }
-            else if ((StatusBarStatus)value == StatusBarStatus.resting)
-            {
+            } else if ((StatusBarStatus)value == StatusBarStatus.resting) {
                 return "#d27e05";
-            }
-            else
-            {
+            } else {
                 return "#252525";
             }
         }
 
         public object ConvertBack(object value, Type targetType, object parameter,
-            System.Globalization.CultureInfo culture)
-        {
+            System.Globalization.CultureInfo culture) {
             throw new NotSupportedException();
         }
     }

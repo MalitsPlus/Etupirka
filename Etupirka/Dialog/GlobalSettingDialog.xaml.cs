@@ -15,52 +15,47 @@ using Microsoft.Win32;
 
 namespace Etupirka.Dialogs
 {
-	/// <summary>
-	/// Interaction logic for GlobalSettingDialog.xaml
-	/// </summary>
-	public partial class GlobalSettingDialog : MetroWindow
-	{
+    /// <summary>
+    /// Interaction logic for GlobalSettingDialog.xaml
+    /// </summary>
+    public partial class GlobalSettingDialog : MetroWindow
+    {
 
-	//	Views.ProxyConfigView pcv;
-		public GlobalSettingDialog()
-		{
-			InitializeComponent();
-			if (Properties.Settings.Default.disableGlowBrush)
-			{
-				this.GlowBrush = null;
-			}
-		//	pcv = new Views.ProxyConfigView();
-		}
+        //	Views.ProxyConfigView pcv;
+        public GlobalSettingDialog() {
+            InitializeComponent();
+            if (Properties.Settings.Default.disableGlowBrush) {
+                this.GlowBrush = null;
+            }
+            //	pcv = new Views.ProxyConfigView();
+        }
 
-		private void btnDialogOk_Click(object sender, RoutedEventArgs e)
-		{
-			Properties.Settings.Default["proxyType"] = (int)NetworkView.MyProxyType;
-			Properties.Settings.Default["proxyAddress"] = NetworkView.ProxyAddress;
-			Properties.Settings.Default["proxyPort"] = NetworkView.ProxyPort;
-			Properties.Settings.Default["proxyUser"] = NetworkView.ProxyUser;
-			Properties.Settings.Default["proxyPassword"] = NetworkView.passwordBox.Password;
-			Properties.Settings.Default.differExecuatableGame = GeneralView.DifferExecuatableGame;
-			Properties.Settings.Default.setStartUp = GeneralView.SetStartUp;
-			Properties.Settings.Default.watchProcess = GeneralView.WatchProcess;
-			Properties.Settings.Default.monitorInterval = GeneralView.MontiorInterval;
-			Properties.Settings.Default.playVoice = GeneralView.PlayVoice;
-			Properties.Settings.Default.minimizeAtStartup = GeneralView.MinimizeAtStartup;
-			Properties.Settings.Default.askBeforeExit = GeneralView.AskBeforeExit;
-			Properties.Settings.Default.checkUpdate = GeneralView.CheckUpdate;
-			Properties.Settings.Default.disableGlowBrush = GeneralView.DisableGlowBrush;
+        private void btnDialogOk_Click(object sender, RoutedEventArgs e) {
+            Properties.Settings.Default["proxyType"] = (int)NetworkView.MyProxyType;
+            Properties.Settings.Default["proxyAddress"] = NetworkView.ProxyAddress;
+            Properties.Settings.Default["proxyPort"] = NetworkView.ProxyPort;
+            Properties.Settings.Default["proxyUser"] = NetworkView.ProxyUser;
+            Properties.Settings.Default["proxyPassword"] = NetworkView.passwordBox.Password;
+            Properties.Settings.Default.differExecuatableGame = GeneralView.DifferExecuatableGame;
+            Properties.Settings.Default.setStartUp = GeneralView.SetStartUp;
+            Properties.Settings.Default.watchProcess = GeneralView.WatchProcess;
+            Properties.Settings.Default.monitorInterval = GeneralView.MontiorInterval;
+            Properties.Settings.Default.playVoice = GeneralView.PlayVoice;
+            Properties.Settings.Default.minimizeAtStartup = GeneralView.MinimizeAtStartup;
+            Properties.Settings.Default.askBeforeExit = GeneralView.AskBeforeExit;
+            Properties.Settings.Default.checkUpdate = GeneralView.CheckUpdate;
+            Properties.Settings.Default.disableGlowBrush = GeneralView.DisableGlowBrush;
             Properties.Settings.Default.hideListWhenPlaying = GeneralView.HideListWhenPlaying;
             Properties.Settings.Default.useOfflineESDatabase = DatabaseView.UseOfflineDatabase;
-			Properties.Settings.Default.databaseSyncServer = DatabaseView.DatabaseSyncServer;
-			Properties.Settings.Default.Save();
-			this.DialogResult = true;
-		}
+            Properties.Settings.Default.databaseSyncServer = DatabaseView.DatabaseSyncServer;
+            Properties.Settings.Default.Save();
+            this.DialogResult = true;
+        }
 
-		private void TabControl_SelectionChanged(object sender, SelectionChangedEventArgs e)
-		{
-			this.Dispatcher.BeginInvoke(new Action(() =>
-			{
-				this.ConfigTab.Focus();
-			}));
-		}
-	}
+        private void TabControl_SelectionChanged(object sender, SelectionChangedEventArgs e) {
+            this.Dispatcher.BeginInvoke(new Action(() => {
+                this.ConfigTab.Focus();
+            }));
+        }
+    }
 }

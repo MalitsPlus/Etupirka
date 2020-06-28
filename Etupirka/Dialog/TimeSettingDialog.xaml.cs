@@ -14,30 +14,27 @@ using System.Windows.Shapes;
 
 namespace Etupirka.Dialog
 {
-	/// <summary>
-	/// Interaction logic for TimeSettingDialog.xaml
-	/// </summary>
-	public partial class TimeSettingDialog : MetroWindow
-	{
-		GameExecutionInfo game, bgame;
-		public TimeSettingDialog(GameExecutionInfo g)
-		{
-			game = g;
-			bgame =(GameExecutionInfo) g.Clone();
-			this.DataContext = bgame;
-			InitializeComponent();
-			if (Properties.Settings.Default.disableGlowBrush)
-			{
-				this.GlowBrush = null;
-			}
-			tc.DataContext = bgame;
-		}
+    /// <summary>
+    /// Interaction logic for TimeSettingDialog.xaml
+    /// </summary>
+    public partial class TimeSettingDialog : MetroWindow
+    {
+        GameExecutionInfo game, bgame;
+        public TimeSettingDialog(GameExecutionInfo g) {
+            game = g;
+            bgame = (GameExecutionInfo)g.Clone();
+            this.DataContext = bgame;
+            InitializeComponent();
+            if (Properties.Settings.Default.disableGlowBrush) {
+                this.GlowBrush = null;
+            }
+            tc.DataContext = bgame;
+        }
 
-		private void btnDialogOk_Click(object sender, RoutedEventArgs e)
-		{
-			game.Set(bgame);
-			this.DialogResult = true;
-		}
+        private void btnDialogOk_Click(object sender, RoutedEventArgs e) {
+            game.Set(bgame);
+            this.DialogResult = true;
+        }
 
-	}
+    }
 }

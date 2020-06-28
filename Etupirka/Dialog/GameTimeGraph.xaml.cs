@@ -15,24 +15,22 @@ using MahApps.Metro.Controls;
 
 namespace Etupirka.Dialog
 {
-	/// <summary>
-	/// Interaction logic for GameTimeGraph.xaml
-	/// </summary>
-	public partial class GameTimeGraph : MetroWindow
-	{
-		List<GameTimeSummary> glist;
-		public GameTimeGraph(List<GameTimeSummary> g,string subtitle)
-		{
-			glist = g;
-			InitializeComponent();
-			if (Properties.Settings.Default.disableGlowBrush)
-			{
-				this.GlowBrush = null;
-			}
-			crt.ItemsSource = glist;
-			chart.SelectedBrush = null;
-			chart.ChartSubTitle = subtitle;
-		}
+    /// <summary>
+    /// Interaction logic for GameTimeGraph.xaml
+    /// </summary>
+    public partial class GameTimeGraph : MetroWindow
+    {
+        List<GameTimeSummary> glist;
+        public GameTimeGraph(List<GameTimeSummary> g, string subtitle) {
+            glist = g;
+            InitializeComponent();
+            if (Properties.Settings.Default.disableGlowBrush) {
+                this.GlowBrush = null;
+            }
+            crt.ItemsSource = glist;
+            chart.SelectedBrush = null;
+            chart.ChartSubTitle = subtitle;
+        }
 
-	}
+    }
 }
