@@ -67,6 +67,15 @@ namespace Etupirka
             }
         }
 
+        protected bool isNukige;
+        public bool IsNukige {
+            get { return isNukige; }
+            set {
+                isNukige = value;
+                OnPropertyChanged("IsNukige");
+            }
+        }
+
         protected DateTime saleDay;
         public DateTime SaleDay {
             get { return saleDay; }
@@ -112,6 +121,7 @@ namespace Etupirka
                 string matchTitle = "<div id=\"soft-title\"><span class=\"bold\">(?<title>.*?)</span>";
                 string matchBrand = "<td><a href=\"brand.php\\?brand=(?<brandid>.*?)\">(?<brand>.*?)</a></td>";
                 string matchSaleDay = "<td><a href=\"toukei_hatubaibi.php\\?.*\">(?<saleday>.*?)</a></td>";
+                string matchNukige = "<tr id=\"erogame\"><th>18禁等</th><td>(?<nukige>.*?)</td></tr>";
 
                 Regex re = new Regex(matchTitle, RegexOptions.IgnoreCase);
                 for (Match m = re.Match(result); m.Success; m = m.NextMatch()) {
@@ -127,6 +137,12 @@ namespace Etupirka
                 for (Match m = re.Match(result); m.Success; m = m.NextMatch()) {
                     string saleday = m.Groups["saleday"].Value;
                     SaleDay = DateTime.ParseExact(saleday, "yyyy-MM-dd", System.Globalization.CultureInfo.InvariantCulture);
+                    //		Console.Write(saleday);
+                }
+                re = new Regex(matchNukige, RegexOptions.IgnoreCase);
+                for (Match m = re.Match(result); m.Success; m = m.NextMatch()) {
+                    string saleday = m.Groups["saleday"].Value;
+                    IsNukige = System.Net.WebUtility.HtmlDecode(m.Groups["nukige"].Value).Contains(">抜きゲー");
                     //		Console.Write(saleday);
                 }
             }

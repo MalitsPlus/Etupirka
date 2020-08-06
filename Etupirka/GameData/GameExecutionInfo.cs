@@ -43,12 +43,13 @@ namespace Etupirka
             displayInfo = new DisplayInfo();
         }
 
-        public GameExecutionInfo(string _uid, string _title, string _brand, int _esid, DateTime _saleday,
+        public GameExecutionInfo(string _uid, string _title, string _brand, bool _isNukige, int _esid, DateTime _saleday,
             int _playtime, DateTime _firstplay, DateTime _lastplay,
             bool _pne, string _procpath, string _execpath, DisplayInfo _displayInfo) {
             uid = _uid;
             title = _title;
             brand = _brand;
+            isNukige = _isNukige;
             erogameScapeID = _esid;
             saleDay = _saleday;
 
@@ -185,6 +186,7 @@ namespace Etupirka
             FirstPlayTime = t.FirstPlayTime;
             LastPlayTime = t.LastPlayTime;
 
+            IsNukige = t.IsNukige;
             IsProcNEqExec = t.IsProcNEqExec;
             IsPathExist = t.IsPathExist;
             ExecPath = t.ExecPath;

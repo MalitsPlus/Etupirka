@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 14
-VisualStudioVersion = 14.0.25420.1
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.30204.135
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Etupirka", "Etupirka\Etupirka.csproj", "{2DE8A7AD-A633-4CE4-AB24-9590A7BB0202}"
 EndProject
@@ -11,12 +11,15 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{2DE8A7AD-A633-4CE4-AB24-9590A7BB0202}.Debug|Any CPU.ActiveCfg = Release|Any CPU
-		{2DE8A7AD-A633-4CE4-AB24-9590A7BB0202}.Debug|Any CPU.Build.0 = Release|Any CPU
+		{2DE8A7AD-A633-4CE4-AB24-9590A7BB0202}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2DE8A7AD-A633-4CE4-AB24-9590A7BB0202}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{2DE8A7AD-A633-4CE4-AB24-9590A7BB0202}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{2DE8A7AD-A633-4CE4-AB24-9590A7BB0202}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {B9E43DF0-4B26-4EC3-999F-FCD8EFBA6C22}
 	EndGlobalSection
 EndGlobal

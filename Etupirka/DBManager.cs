@@ -1,4 +1,5 @@
 ﻿using Etupirka.Dialog;
+using MahApps.Metro.Converters;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -24,6 +25,7 @@ namespace Etupirka
 										`uid`	TEXT NOT NULL,
 										`title`	TEXT,
 										`brand`	TEXT,
+                                        'nukige' INTEGER DEFAULT 0, 
 										`saleday`	TEXT,
 										`esid`	INTEGER DEFAULT 0,
 										PRIMARY KEY(uid));";
@@ -246,13 +248,14 @@ namespace Etupirka
                 using (SQLiteCommand insertTimeRngCmd = (SQLiteCommand)conn.CreateCommand()) {
                     using (SQLiteCommand insertExecRngCmd = (SQLiteCommand)conn.CreateCommand()) {
                         conn.Open();
-                        insertGameRngCmd.CommandText = @"INSERT or REPLACE INTO games VALUES(@UID,@TITLE,@BRAND,@SALEDAY,@ESID)";
+                        insertGameRngCmd.CommandText = @"INSERT or REPLACE INTO games VALUES(@UID,@TITLE,@BRAND,@NUKIGE,@SALEDAY,@ESID)";
                         insertTimeRngCmd.CommandText = @"INSERT or REPLACE INTO gametimeinfo VALUES(@UID,@PLAYTIME,@FIRSTPLAY,@LASTPLAY)";
                         insertExecRngCmd.CommandText = @"INSERT or REPLACE INTO gameexecinfo VALUES(@UID,@P_N_E,@PROCPATH,@EXECPATH)";
 
                         insertGameRngCmd.Parameters.AddWithValue("@UID", i.UID);
                         insertGameRngCmd.Parameters.AddWithValue("@TITLE", i.Title);
                         insertGameRngCmd.Parameters.AddWithValue("@BRAND", i.Brand);
+                        insertGameRngCmd.Parameters.AddWithValue("@NUKIGE", i.IsNukige ? 1 : 0);
                         insertGameRngCmd.Parameters.AddWithValue("@SALEDAY", i.SaleDay.ToString("yyyy-MM-dd"));
                         insertGameRngCmd.Parameters.AddWithValue("@ESID", i.ErogameScapeID);
                         insertGameRngCmd.ExecuteNonQuery();
@@ -279,13 +282,14 @@ namespace Etupirka
                 using (SQLiteCommand insertTimeRngCmd = (SQLiteCommand)conn.CreateCommand()) {
                     using (SQLiteCommand insertExecRngCmd = (SQLiteCommand)conn.CreateCommand()) {
                         conn.Open();
-                        insertGameRngCmd.CommandText = @"UPDATE games SET title=@TITLE,brand=@BRAND,saleday=@SALEDAY,esid=@ESID WHERE uid=@UID";
+                        insertGameRngCmd.CommandText = @"UPDATE games SET title=@TITLE,brand=@BRAND,nukige=@NUKIGE,saleday=@SALEDAY,esid=@ESID WHERE uid=@UID";
                         insertTimeRngCmd.CommandText = @"UPDATE gametimeinfo SET playtime=@PLAYTIME,firstplay=@FIRSTPLAY,lastplay=@LASTPLAY WHERE uid=@UID";
                         insertExecRngCmd.CommandText = @"UPDATE gameexecinfo SET proc_neq_exec=@P_N_E,procpath=@PROCPATH,execpath=@EXECPATH WHERE uid=@UID";
 
                         insertGameRngCmd.Parameters.AddWithValue("@UID", i.UID);
                         insertGameRngCmd.Parameters.AddWithValue("@TITLE", i.Title);
                         insertGameRngCmd.Parameters.AddWithValue("@BRAND", i.Brand);
+                        insertGameRngCmd.Parameters.AddWithValue("@NUKIGE", i.IsNukige ? 1 : 0);
                         insertGameRngCmd.Parameters.AddWithValue("@SALEDAY", i.SaleDay.ToString("yyyy-MM-dd"));
                         insertGameRngCmd.Parameters.AddWithValue("@ESID", i.ErogameScapeID);
                         insertGameRngCmd.ExecuteNonQuery();
@@ -312,7 +316,7 @@ namespace Etupirka
             using (SQLiteCommand insertGameRngCmd = (SQLiteCommand)conn.CreateCommand()) {
                 using (SQLiteCommand insertTimeRngCmd = (SQLiteCommand)conn.CreateCommand()) {
                     using (SQLiteCommand insertExecRngCmd = (SQLiteCommand)conn.CreateCommand()) {
-                        insertGameRngCmd.CommandText = @"INSERT or REPLACE INTO games VALUES(@UID,@TITLE,@BRAND,@SALEDAY,@ESID)";
+                        insertGameRngCmd.CommandText = @"INSERT or REPLACE INTO games VALUES(@UID,@TITLE,@BRAND,@NUKIGE,@SALEDAY,@ESID)";
                         insertTimeRngCmd.CommandText = @"INSERT or REPLACE INTO gametimeinfo VALUES(@UID,@PLAYTIME,@FIRSTPLAY,@LASTPLAY)";
                         insertExecRngCmd.CommandText = @"INSERT or REPLACE INTO gameexecinfo VALUES(@UID,@P_N_E,@PROCPATH,@EXECPATH)";
 
@@ -322,6 +326,7 @@ namespace Etupirka
                                 insertGameRngCmd.Parameters.AddWithValue("@UID", i.UID);
                                 insertGameRngCmd.Parameters.AddWithValue("@TITLE", i.Title);
                                 insertGameRngCmd.Parameters.AddWithValue("@BRAND", i.Brand);
+                                insertGameRngCmd.Parameters.AddWithValue("@NUKIGE", i.IsNukige ? 1 : 0);
                                 insertGameRngCmd.Parameters.AddWithValue("@SALEDAY", i.SaleDay.ToString("yyyy-MM-dd"));
                                 insertGameRngCmd.Parameters.AddWithValue("@ESID", i.ErogameScapeID);
                                 insertGameRngCmd.ExecuteNonQuery();
@@ -350,7 +355,7 @@ namespace Etupirka
             using (SQLiteCommand insertGameRngCmd = (SQLiteCommand)conn.CreateCommand()) {
                 using (SQLiteCommand insertTimeRngCmd = (SQLiteCommand)conn.CreateCommand()) {
                     using (SQLiteCommand insertExecRngCmd = (SQLiteCommand)conn.CreateCommand()) {
-                        insertGameRngCmd.CommandText = @"INSERT or IGNORE INTO games VALUES(@UID,@TITLE,@BRAND,@SALEDAY,@ESID)";
+                        insertGameRngCmd.CommandText = @"INSERT or IGNORE INTO games VALUES(@UID,@TITLE,@BRAND,@NUKIGE,@SALEDAY,@ESID)";
                         insertTimeRngCmd.CommandText = @"INSERT or IGNORE INTO gametimeinfo VALUES(@UID,0,@FIRSTPLAY,@LASTPLAY);
 														 UPDATE gametimeinfo SET playtime=playtime+@PLAYTIME WHERE uid=@UID";
                         insertExecRngCmd.CommandText = @"INSERT or IGNORE INTO gameexecinfo VALUES(@UID,@P_N_E,@PROCPATH,@EXECPATH)";
@@ -361,6 +366,7 @@ namespace Etupirka
                                 insertGameRngCmd.Parameters.AddWithValue("@UID", i.UID);
                                 insertGameRngCmd.Parameters.AddWithValue("@TITLE", i.Title);
                                 insertGameRngCmd.Parameters.AddWithValue("@BRAND", i.Brand);
+                                insertGameRngCmd.Parameters.AddWithValue("@NUKIGE", i.IsNukige ? 1 : 0);
                                 insertGameRngCmd.Parameters.AddWithValue("@SALEDAY", i.SaleDay.ToString("yyyy-MM-dd"));
                                 insertGameRngCmd.Parameters.AddWithValue("@ESID", i.ErogameScapeID);
                                 insertGameRngCmd.ExecuteNonQuery();
@@ -389,12 +395,13 @@ namespace Etupirka
             using (SQLiteCommand insertGameRngCmd = (SQLiteCommand)conn.CreateCommand()) {
                 using (SQLiteCommand insertExecRngCmd = (SQLiteCommand)conn.CreateCommand()) {
                     conn.Open();
-                    insertGameRngCmd.CommandText = @"UPDATE games SET title=@TITLE,brand=@BRAND,saleday=@SALEDAY,esid=@ESID WHERE uid=@UID";
+                    insertGameRngCmd.CommandText = @"UPDATE games SET title=@TITLE,brand=@BRAND,nukige=@NUKIGE,saleday=@SALEDAY,esid=@ESID WHERE uid=@UID";
                     insertExecRngCmd.CommandText = @"UPDATE gameexecinfo SET proc_neq_exec=@P_N_E,procpath=@PROCPATH,execpath=@EXECPATH WHERE uid=@UID";
 
                     insertGameRngCmd.Parameters.AddWithValue("@UID", i.UID);
                     insertGameRngCmd.Parameters.AddWithValue("@TITLE", i.Title);
                     insertGameRngCmd.Parameters.AddWithValue("@BRAND", i.Brand);
+                    insertGameRngCmd.Parameters.AddWithValue("@NUKIGE", i.IsNukige ? 1 : 0);
                     insertGameRngCmd.Parameters.AddWithValue("@SALEDAY", i.SaleDay.ToString("yyyy-MM-dd"));
                     insertGameRngCmd.Parameters.AddWithValue("@ESID", i.ErogameScapeID);
                     insertGameRngCmd.ExecuteNonQuery();
@@ -423,13 +430,14 @@ namespace Etupirka
         public void LoadGame(ObservableCollection<GameExecutionInfo> items) {
             using (SQLiteCommand command = conn.CreateCommand()) {
                 conn.Open();
-                command.CommandText = "SELECT * FROM games g, gametimeinfo t, gameexecinfo e WHERE g.uid=e.uid AND g.uid=t.uid";
+                command.CommandText = "SELECT * FROM games g, gametimeinfo t, gameexecinfo e WHERE g.uid=e.uid AND g.uid=t.uid ORDER BY t.lastplay DESC ";
                 SQLiteDataReader reader = command.ExecuteReader();
                 while (reader.Read()) {
                     GameExecutionInfo i = new GameExecutionInfo(
                          reader["uid"].ToString(),
                          reader["title"].ToString(),
                          reader["brand"].ToString(),
+                         Convert.ToInt32(reader["nukige"].ToString()) == 1,
                          Convert.ToInt32(reader["esid"].ToString()),
                          DateTime.ParseExact(reader["saleday"].ToString(), "yyyy-MM-dd", CultureInfo.InvariantCulture),
                          Convert.ToInt32(reader["playtime"].ToString()),

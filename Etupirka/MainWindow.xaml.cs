@@ -87,6 +87,15 @@ namespace Etupirka
             }
         }
 
+        public bool HideNukige {
+            get {
+                return Properties.Settings.Default.hideNukige;
+            }
+            set {
+                Properties.Settings.Default.hideNukige = value;
+                loadGridData(false);
+            }
+        }
 
         bool erogeHelper = false;
         public bool ErogeHelper {
@@ -159,6 +168,8 @@ namespace Etupirka
 
         private ObservableCollection<GameExecutionInfo> items;
 
+        private ObservableCollection<GameExecutionInfo> itemsForShow;
+
         //private Dictionary<string, TimeData> timeDict;
 
         private System.Windows.Threading.DispatcherTimer watchProcTimer;
@@ -189,13 +200,7 @@ namespace Etupirka
             db = new DBManager(Utility.userDBPath);
             Utility.im = new InformationManager(Utility.infoDBPath);
 
-            items = new ObservableCollection<GameExecutionInfo>();
-            db.LoadGame(items);
-
-            GameListView.ItemsSource = items;
-            GameListView.SelectedItem = null;
-            UpdateStatus();
-            OnPropertyChanged("ItemCount");
+            loadGridData(true);
 
             _hotkey = new HotKey(Key.F9, KeyModifier.Alt, OnHotKeyHandler_WatchProc);
             _hotkey = new HotKey(Key.F8, KeyModifier.Alt, OnHotKeyHandler_ErogeHelper);
@@ -217,6 +222,29 @@ namespace Etupirka
         }
 
         #region Function
+        private async void loadGridData(bool isInit) {
+            GameListView.ItemsSource = null;
+            GameListView.ItemsSource = await TaskEx.Run(() => {
+                if (isInit) {
+                    items = new ObservableCollection<GameExecutionInfo>();
+                    db.LoadGame(items);
+                }
+
+                // hide nukige if the option is enabled 
+                itemsForShow = new ObservableCollection<GameExecutionInfo>();
+                foreach (var it in items) {
+                    if (Settings.Default.hideNukige && it.IsNukige) {
+                        continue;
+                    }
+                    itemsForShow.Add(it);
+                }
+                UpdateStatus();
+                OnPropertyChanged("ItemCount");
+                return itemsForShow;
+            });
+            GameListView.SelectedItem = null;
+        }
+
         private void doCheckUpdate() {
             try {
                 string str = NetworkUtility.GetString("http://etupirka.halcyons.org/checkversion.php");
@@ -250,55 +278,63 @@ namespace Etupirka
             System.Console.WriteLine(calcID);
             bool play_flag = false;
 
+            // Check current processes in background thread 
+
+            Process[] proc = Process.GetProcesses();
+
+            Dictionary<String, bool> dic = new Dictionary<string, bool>();
+            foreach (Process p in proc) {
+                try {
+                    string path = p.MainModule.FileName.ToLower();
+                    if (dic.ContainsKey(path)) {
+                        dic[path] |= p.Id == calcID;
+                    } else {
+                        dic.Add(p.MainModule.FileName.ToLower(), p.Id == calcID);
+                    }
+                } catch (Exception e) {
+                    Console.WriteLine(e);
+                }
+            }
+
+            string statusBarText = "";
+            string trayTipText = "Etupirka Version " + FileVersionInfo.GetVersionInfo(System.Reflection.Assembly.GetExecutingAssembly().Location).FileVersion;
+
+            GameExecutionInfo currentGame = null;
+            foreach (GameExecutionInfo i in items) {
+                bool running = false;
+                if (i.UpdateStatus2(dic, ref running, time))
+                // if (i.UpdateStatus(proc, calcID,ref running, time))
+                {
+                    if (time != 0) {
+                        //string date = DateTime.Now.Date.ToString("yyyy-MM-dd");
+
+                        db.UpdateTimeNow(i.UID, time);
+                    }
+                    db.UpdateGameTimeInfo(i.UID, i.TotalPlayTime, i.FirstPlayTime, i.LastPlayTime);
+                    if (i.Status == ProcStat.Focused) {
+                        play_flag = true;
+                        currentGame = i;
+
+                        if (Properties.Settings.Default.hideListWhenPlaying) {
+                            ErogeHelper = true;
+                        }
+                    }
+                }
+                System.Console.WriteLine(running);
+                if (running) {
+                    trayTipText += "\n" + i.Title + " : " + i.TotalPlayTimeString;
+                }
+            }
+
+            dic.Clear();
+
+            // Update UI in main thread 
             this.Dispatcher.BeginInvoke(
              new Action(() => {
-                 Process[] proc = Process.GetProcesses();
 
-                 Dictionary<String, bool> dic = new Dictionary<string, bool>();
-                 foreach (Process p in proc) {
-                     try {
-                         string path = p.MainModule.FileName.ToLower();
-                         if (dic.ContainsKey(path)) {
-                             dic[path] |= p.Id == calcID;
-                         } else {
-                             dic.Add(p.MainModule.FileName.ToLower(), p.Id == calcID);
-                         }
-                     } catch (Exception e) {
-                         Console.WriteLine(e);
-                     }
-                 }
-
-                 string statusBarText = "";
-                 string trayTipText = "Etupirka Version " + FileVersionInfo.GetVersionInfo(System.Reflection.Assembly.GetExecutingAssembly().Location).FileVersion;
-
-                 foreach (GameExecutionInfo i in items) {
-                     bool running = false;
-                     if (i.UpdateStatus2(dic, ref running, time))
-                     // if (i.UpdateStatus(proc, calcID,ref running, time))
-                     {
-                         if (time != 0) {
-                             //string date = DateTime.Now.Date.ToString("yyyy-MM-dd");
-
-                             db.UpdateTimeNow(i.UID, time);
-                         }
-                         db.UpdateGameTimeInfo(i.UID, i.TotalPlayTime, i.FirstPlayTime, i.LastPlayTime);
-                         if (i.Status == ProcStat.Focused) {
-                             play_flag = true;
-                             PlayMessage.Content = i.Title + " : " + i.TotalPlayTimeString;
-
-                             if (Properties.Settings.Default.hideListWhenPlaying) {
-                                 ErogeHelper = true;
-                             }
-                         }
-                     }
-                     System.Console.WriteLine(running);
-                     if (running) {
-                         trayTipText += "\n" + i.Title + " : " + i.TotalPlayTimeString;
-                     }
-                 }
-
-                 dic.Clear();
-                 if (!play_flag) {
+                 if (play_flag && currentGame != null) {
+                     PlayMessage.Content = currentGame.Title + " : " + currentGame.TotalPlayTimeString;
+                 } else {
                      PlayMessage.Content = statusBarText;
 
                      if (Properties.Settings.Default.hideListWhenPlaying) {
@@ -682,7 +718,6 @@ namespace Etupirka
             }
             */
         private async void UpdateOfflineDatabase_Click(object sender, RoutedEventArgs e) {
-
             try {
                 var controller = await this.ShowProgressAsync("更新しています", "Initializing...");
                 controller.SetCancelable(true);
@@ -854,6 +889,9 @@ namespace Etupirka
         }
 
         private void TryGetGameInfo_Click(object sender, RoutedEventArgs e) {
+
+            // TODO: fetch game info from es 
+
             List<GameInfo> allGames = Utility.im.getAllEsInfo();
             GameExecutionInfo g = (GameExecutionInfo)GameListView.SelectedItem;
             Dictionary<GameInfo, int> dic = new Dictionary<GameInfo, int>();
@@ -883,14 +921,18 @@ namespace Etupirka
                 g.Title = td.SelectedGameInfo.Title;
                 g.Brand = td.SelectedGameInfo.Brand;
                 g.SaleDay = td.SelectedGameInfo.SaleDay;
+                g.IsNukige = false;
                 UpdateStatus();
                 db.UpdateGameInfoAndExec(g);
             }
 
         }
+
+        private void RefreshList_Click(object sender, RoutedEventArgs e) {
+            loadGridData(false);
+        }
+
         #endregion
-
-
     }
 
     #region Command
