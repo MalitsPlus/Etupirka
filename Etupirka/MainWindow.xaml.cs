@@ -35,6 +35,7 @@ using System.Data.SQLite;
 using Etupirka.Dialog;
 using System.Threading.Tasks;
 using Etupirka.Properties;
+using System.Text.RegularExpressions;
 
 namespace Etupirka
 {
@@ -175,9 +176,6 @@ namespace Etupirka
         private System.Windows.Threading.DispatcherTimer watchProcTimer;
 
         private DBManager db;
-
-
-
 
         public MainWindow() {
 
@@ -447,8 +445,6 @@ namespace Etupirka
             db.InsertOrReplaceTime(timeDict);
         }
 
-
-
         void ExportTimeDict(string dataPath) {
             Dictionary<string, TimeData> timeDict = db.GetPlayTime();
 
@@ -475,6 +471,38 @@ namespace Etupirka
                              new XAttribute("uid", y.Key),
                              new XAttribute("value", y.Value)))))));
             xElem.Save(dataPath);
+        }
+
+        private async Task<List<GameInfo>> searchGameFromES(GameExecutionInfo g) {
+
+            List<GameInfo> searchedGames = new List<GameInfo>();
+
+            if (!string.IsNullOrEmpty(g.Title)) {
+                string encodeString = Uri.EscapeDataString(g.Title);
+                var document = await NetworkUtility.GetHtmlDocument($"http://erogamescape.dyndns.org/~ap2/ero/toukei_kaiseki/kensaku.php?category=game&word_category=name&mode=normal&word={encodeString}");
+                var rows = document.GetElementById("result").GetElementsByTagName("tr");
+
+                // include title row
+                if (rows.Count > 1) {
+
+                    for (int i = 1; i < rows.Count; i++) {
+                        // TODO: fetch ESID 
+                        string href = rows[i].GetElementsByTagName("td")[0].GetElementsByTagName("a")[0].GetAttribute("href");
+                        string esid = "0";
+
+                        Match match = Regex.Match(href, @"game\.php\?game=(\d+)#ad$");
+                        if (match.Success == true) {
+                            esid = match.Groups[1].Value;
+                        }
+                        string thisTitle = rows[i].GetElementsByTagName("td")[0].GetElementsByTagName("a")[0].InnerText;
+                        string thisBrand = rows[i].GetElementsByTagName("td")[1].InnerText;
+                        string thisSaleDay = rows[i].GetElementsByTagName("td")[2].InnerText;
+                        DateTime thisSaleDate = DateTime.ParseExact(thisSaleDay, "yyyy-MM-dd", System.Globalization.CultureInfo.InvariantCulture);
+                        searchedGames.Add(new GameInfo(esid, thisTitle, thisBrand, thisSaleDate));
+                    }
+                }
+            }
+            return searchedGames;
         }
         #endregion
 
@@ -575,8 +603,9 @@ namespace Etupirka
                 items.Add(i);
                 db.InsertOrReplaceGame(i);
 
-                UpdateStatus();
-                OnPropertyChanged("ItemCount");
+                loadGridData(false);
+                //UpdateStatus();
+                //OnPropertyChanged("ItemCount");
             }
         }
 
@@ -779,6 +808,9 @@ namespace Etupirka
             t.Start();
         }
 
+        private void RefreshList_Click(object sender, RoutedEventArgs e) {
+            loadGridData(false);
+        }
 
         #endregion
 
@@ -889,9 +921,6 @@ namespace Etupirka
         }
 
         private void TryGetGameInfo_Click(object sender, RoutedEventArgs e) {
-
-            // TODO: fetch game info from es 
-
             List<GameInfo> allGames = Utility.im.getAllEsInfo();
             GameExecutionInfo g = (GameExecutionInfo)GameListView.SelectedItem;
             Dictionary<GameInfo, int> dic = new Dictionary<GameInfo, int>();
@@ -928,11 +957,30 @@ namespace Etupirka
 
         }
 
-        private void RefreshList_Click(object sender, RoutedEventArgs e) {
-            loadGridData(false);
+        private async void TryGetGameInfoOnline_Click(object sender, RoutedEventArgs e) {
+
+            GameExecutionInfo thisGame = (GameExecutionInfo)GameListView.SelectedItem;
+            var searchedList = await searchGameFromES(thisGame);
+
+            Dialog.GameInfoDialog td = new Dialog.GameInfoDialog(searchedList);
+
+            td.Owner = this;
+            if (td.ShowDialog() == true) {
+                thisGame.ErogameScapeID = td.SelectedGameInfo.ErogameScapeID;
+                await thisGame.updateInfoFromES();
+
+                //thisGame.Title = td.SelectedGameInfo.Title;
+                //thisGame.Brand = td.SelectedGameInfo.Brand;
+                //thisGame.SaleDay = td.SelectedGameInfo.SaleDay;
+                //thisGame.IsNukige = false;
+
+                UpdateStatus();
+                db.UpdateGameInfoAndExec(thisGame);
+            }
         }
 
         #endregion
+
     }
 
     #region Command

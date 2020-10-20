@@ -40,7 +40,13 @@ namespace Etupirka
             erogameScapeID = _erogameScapeID;
             GenerateUID();
             updateInfoFromES();
+        }
 
+        public GameInfo(string _esid, string _title, string _brand, DateTime _saleDay) {
+            erogameScapeID = int.Parse(_esid);
+            title = _title;
+            brand = _brand;
+            saleDay = _saleDay;
         }
 
         protected int erogameScapeID;
@@ -122,7 +128,7 @@ namespace Etupirka
                 string saleday = document.GetElementById("sellday").GetElementsByTagName("td")[0].InnerText;
                 SaleDay = DateTime.ParseExact(saleday, "yyyy-MM-dd", System.Globalization.CultureInfo.InvariantCulture);
                 string eighteen = document.GetElementById("erogame").GetElementsByTagName("td")[0].InnerText;
-                IsNukige = eighteen.Contains("\r\n抜きゲー");
+                IsNukige = eighteen.Contains("\n抜きゲー");
             }
         }
 

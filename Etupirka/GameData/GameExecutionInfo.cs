@@ -94,10 +94,18 @@ namespace Etupirka
             }
         }
 
+        /// <summary>
+        /// Update Status, FirstPlayTime, LastPlayTime, totalPlayTime
+        /// </summary>
+        /// <param name="dic">dictionary of processes</param>
+        /// <param name="running">always false</param>
+        /// <param name="time">interval, usually 0 (at initialization) or 5</param>
+        /// <returns></returns>
         public bool UpdateStatus2(Dictionary<String, bool> dic, ref bool running, int time = 0) {
             ProcStat LastStatus = Status;
             IsPathExist = CheckPath();
             if (!IsPathExist) {
+                // Condition: uninstalled
                 Status = ProcStat.NotExist;
             } else {
                 Status = ProcStat.Rest;
@@ -107,19 +115,22 @@ namespace Etupirka
                         FirstPlayTime = DateTime.Now;
                     }
                     if (dic[ProcPath.ToLower()]) {
+                        // Condition: focused, then return
                         Status = ProcStat.Focused;
                         if (time != 0) {
                             addTime(time);
                         }
                         return true;
                     } else {
+                        // Condition: unfocused
                         Status = ProcStat.Unfocused;
                     }
-
                 }
             }
             if (LastStatus == ProcStat.Focused || LastStatus == ProcStat.Unfocused) {
+                // Condition: last status is running, current status is not focused
                 if (Status == ProcStat.Rest || Status == ProcStat.NotExist) {
+                    // Condition: current status is resting, then update LastPlayTime
                     LastPlayTime = DateTime.Now;
                     DisplaySettings.RestoreDisplay(this);
                     return true;
