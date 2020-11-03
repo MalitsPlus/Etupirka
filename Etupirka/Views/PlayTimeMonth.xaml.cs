@@ -13,6 +13,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using Etupirka.Properties;
 
 namespace Etupirka.Views
 {
@@ -43,7 +44,10 @@ namespace Etupirka.Views
 					command.CommandText = @"SELECT SUM(p.playtime) t
 										FROM games g,playtime p 
 										WHERE g.uid=p.game AND date(p.datetime) between date('" + d.ToString("yyyy-MM-dd") + @"') AND
-																						date('" + d.AddMonths(1).AddDays(-1).ToString("yyyy-MM-dd") + @"')";
+										date('" + d.AddMonths(1).AddDays(-1).ToString("yyyy-MM-dd") + @"') ";
+					if (Settings.Default.hideNukige) {
+						command.CommandText += @" AND g.nukige = 0 ";
+					}
 					using (SQLiteDataReader reader = command.ExecuteReader())
 					{
 
@@ -84,13 +88,20 @@ namespace Etupirka.Views
 
 					using (SQLiteCommand command = conn.CreateCommand())
 					{
+						string hideNukige = "";
+						if (Settings.Default.hideNukige) {
+							hideNukige = @" AND g.nukige = 0 ";
+						}
 						conn.Open();
-						command.CommandText = @"SELECT g.title,SUM(p.playtime) playtime
-											FROM  games g,playtime p 
-											WHERE g.uid=p.game AND p.datetime BETWEEN 
-											date('"+g.d.ToString("yyyy-MM-dd")+@"') AND 
-											date('"+g.d.AddMonths(1).AddDays(-1).ToString("yyyy-MM-dd")+@"')
-											GROUP BY g.uid";
+						command.CommandText = 
+							@"SELECT g.title,SUM(p.playtime) playtime
+							FROM  games g,playtime p 
+							WHERE g.uid=p.game " + hideNukige + @"
+							AND p.datetime BETWEEN 
+							date('"+g.d.ToString("yyyy-MM-dd")+@"') AND 
+							date('"+g.d.AddMonths(1).AddDays(-1).ToString("yyyy-MM-dd")+@"')
+							GROUP BY g.uid";
+
 						using (SQLiteDataReader reader = command.ExecuteReader())
 						{
 							while (reader.Read())
@@ -100,7 +111,7 @@ namespace Etupirka.Views
 						}
 					}
 					conn.Close();
-					Dialog.GameTimeGraph gtg = new GameTimeGraph(glist, g.d.ToString("yyyy-MM-dd") + "~" +g.d.AddMonths(1).AddDays(-1).ToString("yyyy-MM-dd"));
+					Dialog.GameTimeGraph gtg = new GameTimeGraph(glist, g.d.ToString("yyyy-MM-dd") + "~" +g.d.AddMonths(1).AddDays(-1).ToString("yyyy-MM-dd"), GraphType.Monthly);
 					gtg.Owner = Window.GetWindow(this);
 					if (gtg.ShowDialog() == true)
 					{

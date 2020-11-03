@@ -43,6 +43,12 @@ namespace Etupirka.Dialog
 			}
 		}
 
+		public string YearString {
+			get {
+				return d.ToString("yyyy");
+			}
+		}
+
 		public int time { get; set; }
 		public string TimeString
 		{
@@ -58,22 +64,30 @@ namespace Etupirka.Dialog
 
 	public class GameTimeSummary
 	{
-		public GameTimeSummary(string game, int time)
+		
+		public GameTimeSummary(string game, int time, GraphType type = GraphType.All)
 		{
 			Game = game;
 			t = time;
-
-		}
-		int t;
-		public string Game{ get;set; }
-		public double PlayTime
-		{
-			get
-			{
-				return Math.Round((Convert.ToDouble(t) / 60), 2);
+			_type = type;
+			if (_type == GraphType.Yearly) {
+				PlayTime = Math.Round((Convert.ToDouble(t) / 3600), 2);
+			} else {
+				PlayTime = Math.Round((Convert.ToDouble(t) / 60), 2);
 			}
 		}
+		// second
+		public int t;
+		public int n;
+		private GraphType _type;
 
+		public string Description {
+			get {
+				return "プレイ時間";
+            }
+        }
+		public string Game{ get;set; }
+		public double PlayTime { get; private set; }
 	}
 
 	public partial class PlayTimeStatisticDialog : MetroWindow
@@ -95,6 +109,7 @@ namespace Etupirka.Dialog
 				PlayTimeLast30Days.Setup(conn);
 				PlayTimeWeek.Setup(conn);
 				PlayTimeMonth.Setup(conn);
+				PlayTimeYear.Setup(conn);
 				PlayTimeAll.Setup(conn);
 			}
 		}

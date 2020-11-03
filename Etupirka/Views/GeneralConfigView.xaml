@@ -6,9 +6,10 @@
              xmlns:Controls="clr-namespace:MahApps.Metro.Controls;assembly=MahApps.Metro"
              xmlns:local="clr-namespace:Etupirka.Views"
              mc:Ignorable="d" 
-             d:DesignHeight="320" d:DesignWidth="300">
-    <Grid Margin="10">
+             d:DesignHeight="340" d:DesignWidth="300">
+    <Grid Margin="11">
         <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
@@ -44,6 +45,8 @@
         <CheckBox Margin="2" Focusable="False" Grid.Row="8"  HorizontalAlignment="Right" Grid.Column="1" IsChecked="{Binding DisableGlowBrush}"></CheckBox>
         <Label Margin="2" Grid.Row="9" Grid.Column="0">ゲーム実行中にリストを隠す</Label>
         <CheckBox Margin="2" Focusable="False" Grid.Row="9"  HorizontalAlignment="Right" Grid.Column="1" IsChecked="{Binding HideListWhenPlaying}"></CheckBox>
+        <Label Margin="2" Grid.Row="10" Grid.Column="0">年間統計で全てのゲームを表示</Label>
+        <CheckBox Margin="2" Focusable="False" Grid.Row="10"  HorizontalAlignment="Right" Grid.Column="1" IsChecked="{Binding ShowAllGameInYearGraph}"></CheckBox>
 
     </Grid>
 </UserControl>

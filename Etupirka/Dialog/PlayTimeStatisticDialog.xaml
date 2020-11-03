@@ -24,6 +24,12 @@
                 <Views:PlayTimeMonth x:Name="PlayTimeMonth" />
 
             </Controls:MetroTabItem>
+
+            <Controls:MetroTabItem Header="年別" Controls:ControlsHelper.HeaderFontSize="18">
+                <Views:PlayTimeYear x:Name="PlayTimeYear" />
+
+            </Controls:MetroTabItem>
+
             <Controls:MetroTabItem Header="すべて" Controls:ControlsHelper.HeaderFontSize="18">
                 <Views:PlayTimeAll x:Name="PlayTimeAll" />
 

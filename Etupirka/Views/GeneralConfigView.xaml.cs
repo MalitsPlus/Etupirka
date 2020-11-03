@@ -29,8 +29,10 @@ namespace Etupirka.Views
 		public bool CheckUpdate { get; set; }
 		public bool DisableGlowBrush { get; set; }
         public bool HideListWhenPlaying { get; set; }
+		public bool ShowAllGameInYearGraph { get; set; }
 
-        public GeneralConfigView()
+
+		public GeneralConfigView()
 		{
 			InitializeComponent();
 			this.DataContext = this;
@@ -44,6 +46,7 @@ namespace Etupirka.Views
 			CheckUpdate = Properties.Settings.Default.checkUpdate;
 			DisableGlowBrush = Properties.Settings.Default.disableGlowBrush;
             HideListWhenPlaying = Properties.Settings.Default.hideListWhenPlaying;
+			ShowAllGameInYearGraph = Properties.Settings.Default.showAllGameInYearGraph;
 		}
 	}
 }

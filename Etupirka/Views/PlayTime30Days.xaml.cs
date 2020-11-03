@@ -13,6 +13,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using Etupirka.Properties;
 
 namespace Etupirka.Views
 {
@@ -35,12 +36,17 @@ namespace Etupirka.Views
 			conn = _conn;
 			using (SQLiteCommand command = conn.CreateCommand())
 			{
+				string hideNukige = "";
+				if (Settings.Default.hideNukige) {
+					hideNukige = @" AND g.nukige = 0 ";
+				}
 				conn.Open();
 				DateTime d = DateTime.Today;
 				for(int i=0;i<30;i++,d=d.AddDays(-1)){
 						command.CommandText = @"SELECT SUM(p.playtime) t ,p.datetime  
 										FROM games g,playtime p 
-										WHERE g.uid=p.game AND date(p.datetime) = date('"+d.ToString("yyyy-MM-dd")+@"') 
+										WHERE g.uid=p.game " + hideNukige + @"
+										AND date(p.datetime) = date('" + d.ToString("yyyy-MM-dd")+@"') 
 										GROUP BY p.datetime";
 						using (SQLiteDataReader reader = command.ExecuteReader())
 						{
@@ -74,10 +80,16 @@ namespace Etupirka.Views
 					
 					using (SQLiteCommand command = conn.CreateCommand())
 					{
+						string hideNukige = "";
+						if (Settings.Default.hideNukige) {
+							hideNukige = @" AND g.nukige = 0 ";
+						}
 						conn.Open();
-						command.CommandText = @"SELECT  g.title, p.playtime FROM games g,playtime p 
-											WHERE g.uid=p.game AND p.datetime=date('"
-											+g.d.ToString("yyyy-MM-dd")+@"') ";
+						command.CommandText = @"SELECT g.title, p.playtime 
+											FROM games g,playtime p 
+											WHERE g.uid=p.game " + hideNukige + @"
+											AND p.datetime=date('"
+											+ g.d.ToString("yyyy-MM-dd")+@"') ";
 						using (SQLiteDataReader reader = command.ExecuteReader())
 						{
 							while (reader.Read())
@@ -87,7 +99,7 @@ namespace Etupirka.Views
 						}
 					}
 					conn.Close();
-					Dialog.GameTimeGraph gtg = new GameTimeGraph(glist,g.d.ToString("yyyy-MM-dd"));
+					Dialog.GameTimeGraph gtg = new GameTimeGraph(glist, g.d.ToString("yyyy-MM-dd"), GraphType.Last30Days);
 					gtg.Owner = Window.GetWindow(this);
 					if (gtg.ShowDialog()==true)
 					{

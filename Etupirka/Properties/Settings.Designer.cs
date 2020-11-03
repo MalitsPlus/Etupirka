@@ -262,5 +262,17 @@ namespace Etupirka.Properties {
                 this["hideNukige"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool showAllGameInYearGraph {
+            get {
+                return ((bool)(this["showAllGameInYearGraph"]));
+            }
+            set {
+                this["showAllGameInYearGraph"] = value;
+            }
+        }
     }
 }

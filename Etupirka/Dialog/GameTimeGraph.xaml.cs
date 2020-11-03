@@ -21,16 +21,32 @@ namespace Etupirka.Dialog
     public partial class GameTimeGraph : MetroWindow
     {
         List<GameTimeSummary> glist;
-        public GameTimeGraph(List<GameTimeSummary> g, string subtitle) {
+        public GameTimeGraph(List<GameTimeSummary> g, string subtitle, GraphType type, int othersNum = 0) {
             glist = g;
             InitializeComponent();
             if (Properties.Settings.Default.disableGlowBrush) {
                 this.GlowBrush = null;
             }
-            crt.ItemsSource = glist;
+            int totalTime = 0;
+            g.ForEach(it => {
+                totalTime += it.t;
+            });
             chart.SelectedBrush = null;
-            chart.ChartSubTitle = subtitle;
+            TimeSummary summary = new TimeSummary("1970-01-01", totalTime);
+            chart.ChartSubTitle = $"{ subtitle }\r\nトータルプレイ時間：{ summary.TimeString }、合計{ g.Count + othersNum - 1 }本";
+            if (type == GraphType.Yearly) {
+                chart.ChartTitle = "タイトル別プレイ時間（hours）";
+            }
+            crt.ItemsSource = glist;
         }
+    }
 
+    public enum GraphType
+    {
+        Last30Days,
+        Weekly,
+        Monthly,
+        Yearly,
+        All
     }
 }

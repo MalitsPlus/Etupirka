@@ -156,6 +156,12 @@
     <Compile Include="Dialog\DisplaySettingsHelpDialog.xaml.cs">
       <DependentUpon>DisplaySettingsHelpDialog.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Dialog\GameTimeBarGraph.xaml.cs">
+      <DependentUpon>GameTimeBarGraph.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Dialog\GameTimeBarGraph2.xaml.cs">
+      <DependentUpon>GameTimeBarGraph2.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Dialog\GameTimeGraph.xaml.cs">
       <DependentUpon>GameTimeGraph.xaml</DependentUpon>
       <SubType>Code</SubType>
@@ -184,6 +190,9 @@
     </Compile>
     <Compile Include="Views\PlayTimeWeek.xaml.cs">
       <DependentUpon>PlayTimeWeek.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\PlayTimeYear.xaml.cs">
+      <DependentUpon>PlayTimeYear.xaml</DependentUpon>
     </Compile>
     <Page Include="App.xaml">
       <Generator>MSBuild:Compile</Generator>
@@ -237,6 +246,14 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Dialog\GamePropertyDialog.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Dialog\GameTimeBarGraph.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Dialog\GameTimeBarGraph2.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -316,6 +333,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Views\PlayTimeWeek.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\PlayTimeYear.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
