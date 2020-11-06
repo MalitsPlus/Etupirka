@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -45,7 +46,8 @@ namespace Etupirka
 
         public GameExecutionInfo(string _uid, string _title, string _brand, bool _isNukige, int _esid, DateTime _saleday,
             int _playtime, DateTime _firstplay, DateTime _lastplay,
-            bool _pne, string _procpath, string _execpath, DisplayInfo _displayInfo) {
+            bool _pne, string _procpath, string _execpath, DisplayInfo _displayInfo,
+            bool _cleared, string _comment, string _commentDate, string _latestUpdate) {
             uid = _uid;
             title = _title;
             brand = _brand;
@@ -62,6 +64,77 @@ namespace Etupirka
             execPath = _execpath;
 
             displayInfo = _displayInfo;
+
+            cleared = _cleared;
+            comment = _comment;
+
+            if (_commentDate != "") {
+                commentDate = DateTime.ParseExact(_commentDate, "yyyy-MM-dd", CultureInfo.InvariantCulture);
+            } else {
+                commentDate = DateTime.Parse("1970-01-01");
+            }
+
+            if (_latestUpdate != "") {
+                latestUpdate = DateTime.ParseExact(_latestUpdate, "yyyy-MM-dd", CultureInfo.InvariantCulture);
+            } else {
+                latestUpdate = DateTime.Parse("1970-01-01");
+            }
+        }
+
+        protected DateTime latestUpdate;
+        public DateTime LatestUpdate {
+            get { return latestUpdate; }
+            set {
+                latestUpdate = value;
+                OnPropertyChanged("LatestUpdate");
+                OnPropertyChanged("LatestUpdateString");
+            }
+        }
+        public string LatestUpdateString {
+            get {
+                if (latestUpdate.Ticks != 0)
+                    return latestUpdate.ToString("yyyy-MM-dd");
+                else return "";
+            }
+        }
+
+        protected DateTime commentDate;
+        public DateTime CommentDate {
+            get { return commentDate; }
+            set {
+                commentDate = value;
+                OnPropertyChanged("CommentDate");
+                OnPropertyChanged("CommentDateString");
+            }
+        }
+        public string CommentDateString {
+            get {
+                if (commentDate.Ticks != 0)
+                    return commentDate.ToString("yyyy-MM-dd");
+                else return "";
+            }
+        }
+
+        protected string comment;
+        public string Comment {
+            get {
+                return comment;
+            }
+            set {
+                comment = value;
+                OnPropertyChanged("Comment");
+            }
+        }
+
+        protected bool cleared;
+        public bool Cleared {
+            get {
+                return cleared;
+            }
+            set {
+                cleared = value;
+                OnPropertyChanged("Cleared");
+            }
         }
 
         bool isPathExist;

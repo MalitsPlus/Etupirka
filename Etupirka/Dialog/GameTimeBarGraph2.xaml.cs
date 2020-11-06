@@ -46,19 +46,22 @@ namespace Etupirka.Dialog
 
             string otherString = "";
 
+            int gameCount = g.Count;
             if (otherTitles != null) {
                 otherString += "その他：";
                 otherTitles.ForEach(it => {
                     otherString += $"「{ it.Game }」";
                 });
+                gameCount = g.Count + otherTitles.Count - 1;
             }
             
             DataContext = new Graph2Context { Hint = otherString };
 
             chart.SelectedBrush = null;
+            
 
             TimeSummary summary = new TimeSummary("1970-01-01", totalTime);
-            chart.ChartSubTitle = $"{ subtitle }\r\nトータルプレイ時間：{ summary.TimeString }、合計{ g.Count + otherTitles.Count - 1 }本";
+            chart.ChartSubTitle = $"{ subtitle }\r\nトータルプレイ時間：{ summary.TimeString }、合計{ gameCount }本";
             if (type == GraphType.Yearly) {
                 chart.ChartTitle = "タイトル別プレイ時間（hours）";
             }

@@ -57,6 +57,14 @@ namespace Etupirka
 										`enabled`	INTEGER NOT NULL DEFAULT 0,
 										PRIMARY KEY(uid, device_id))";
                     command.ExecuteNonQuery();
+                    command.CommandText = @"CREATE TABLE `gamecomment` (
+										`uid`	TEXT,
+										`cleared`	INTEGER DEFAULT 0,
+										`comment`	TEXT,
+										`commentdate`	TEXT,
+                                        `latestupdate`	TEXT,
+										PRIMARY KEY(uid))";
+                    command.ExecuteNonQuery();
                 }
                 conn.Close();
             } else {
@@ -74,6 +82,22 @@ namespace Etupirka
 										PRIMARY KEY(uid, device_id))";
                         command.ExecuteNonQuery();
                     }
+
+                    reader.Close();
+                    command.CommandText = "SELECT name FROM sqlite_master WHERE type='table' AND name='gamecomment'";
+                    reader = command.ExecuteReader();
+                    if (!reader.Read()) {
+                        reader.Close();
+                        command.CommandText = @"CREATE TABLE `gamecomment` (
+										`uid`	TEXT,
+										`cleared`	INTEGER DEFAULT 0,
+										`comment`	TEXT,
+										`commentdate`	TEXT,
+                                        `latestupdate`	TEXT,
+										PRIMARY KEY(uid))";
+                        command.ExecuteNonQuery();
+                    }
+
                 }
                 conn.Close();
             }
@@ -430,28 +454,34 @@ namespace Etupirka
         public void LoadGame(ObservableCollection<GameExecutionInfo> items) {
             using (SQLiteCommand command = conn.CreateCommand()) {
                 conn.Open();
-                command.CommandText = "SELECT * FROM games g, gametimeinfo t, gameexecinfo e WHERE g.uid=e.uid AND g.uid=t.uid ORDER BY t.lastplay DESC ";
+                command.CommandText = @"SELECT * FROM games g, gametimeinfo t, gameexecinfo e 
+                                        LEFT JOIN gamecomment c ON g.uid=c.uid 
+                                        WHERE g.uid=e.uid 
+                                        AND g.uid=t.uid 
+                                        ORDER BY t.lastplay DESC";
                 SQLiteDataReader reader = command.ExecuteReader();
                 while (reader.Read()) {
-                    GameExecutionInfo i = new GameExecutionInfo(
-                         reader["uid"].ToString(),
-                         reader["title"].ToString(),
-                         reader["brand"].ToString(),
-                         Convert.ToInt32(reader["nukige"].ToString()) == 1,
-                         Convert.ToInt32(reader["esid"].ToString()),
-                         DateTime.ParseExact(reader["saleday"].ToString(), "yyyy-MM-dd", CultureInfo.InvariantCulture),
-                         Convert.ToInt32(reader["playtime"].ToString()),
-                         DateTime.ParseExact(reader["firstplay"].ToString(), "yyyy-MM-dd HH:mm:ss", CultureInfo.InvariantCulture),
-                         DateTime.ParseExact(reader["lastplay"].ToString(), "yyyy-MM-dd HH:mm:ss", CultureInfo.InvariantCulture),
-                         (Convert.ToInt32(reader["proc_neq_exec"].ToString()) == 1 ? true : false),
-                         reader["procpath"].ToString(),
-                         reader["execpath"].ToString(),
-                         LoadGameDisplayInfo(reader["uid"].ToString())
-                         );
+                        GameExecutionInfo i = new GameExecutionInfo(
+                        reader["uid"].ToString(),
+                        reader["title"].ToString(),
+                        reader["brand"].ToString(),
+                        Convert.ToInt32(reader["nukige"].ToString()) == 1,
+                        Convert.ToInt32(reader["esid"].ToString()),
+                        DateTime.ParseExact(reader["saleday"].ToString(), "yyyy-MM-dd", CultureInfo.InvariantCulture),
+                        Convert.ToInt32(reader["playtime"].ToString()),
+                        DateTime.ParseExact(reader["firstplay"].ToString(), "yyyy-MM-dd HH:mm:ss", CultureInfo.InvariantCulture),
+                        DateTime.ParseExact(reader["lastplay"].ToString(), "yyyy-MM-dd HH:mm:ss", CultureInfo.InvariantCulture),
+                        (Convert.ToInt32(reader["proc_neq_exec"].ToString()) == 1 ? true : false),
+                        reader["procpath"].ToString(),
+                        reader["execpath"].ToString(),
+                        LoadGameDisplayInfo(reader["uid"].ToString()),
+                        Convert.ToInt32(reader["cleared"].ToString() == "" ? "0" : reader["cleared"].ToString()) == 1,
+                        reader["comment"].ToString(),
+                        reader["commentdate"].ToString(),
+                        reader["latestupdate"].ToString()
+                        );
                     items.Add(i);
-
                 }
-
                 conn.Close();
             }
         }
@@ -495,6 +525,20 @@ namespace Etupirka
                 command.Parameters.AddWithValue("@PLAYTIME", time);
                 command.Parameters.AddWithValue("@FIRSTPLAY", firstplay.ToString("yyyy-MM-dd HH:mm:ss"));
                 command.Parameters.AddWithValue("@LASTPLAY", lastplay.ToString("yyyy-MM-dd HH:mm:ss"));
+                command.ExecuteNonQuery();
+                conn.Close();
+            }
+        }
+
+        public void UpdateGameComment(GameExecutionInfo i) {
+            using (SQLiteCommand command = conn.CreateCommand()) {
+                conn.Open();
+                command.CommandText = @"INSERT or REPLACE INTO gamecomment VALUES(@UID,@CLEARED,@COMMENT,@COMMENTDATE,@LATESTDUPDATE)";
+                command.Parameters.AddWithValue("@UID", i.UID);
+                command.Parameters.AddWithValue("@CLEARED", i.Cleared ? 1 : 0);
+                command.Parameters.AddWithValue("@COMMENT", i.Comment);
+                command.Parameters.AddWithValue("@COMMENTDATE", i.CommentDate.Year == 1970 ? DateTime.Today.ToString("yyyy-MM-dd") : i.CommentDateString);
+                command.Parameters.AddWithValue("@LATESTDUPDATE", DateTime.Today.ToString("yyyy-MM-dd"));
                 command.ExecuteNonQuery();
                 conn.Close();
             }

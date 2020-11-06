@@ -154,6 +154,7 @@
                         <MenuItem Header="フォルダーを開く"  Name="OpenFolder" Click="OpenFolder_Click"/>
                         <MenuItem Header="ErogameScapeを開く" Name="OpenES" Click="OpenES_Click" />
                         <MenuItem Header="プレイ統計を開く" Name="OpenPlayStatistics" Click="OpenPlayStatistics_Click" />
+                        <MenuItem Header="コメントを開く" Name="OpenComment" Click="OpenComment_Click" />
                     </MenuItem>
                     <MenuItem Header="コビー">
                         <MenuItem Header="タイトル"  Name="CopyTitle" Click="CopyTitle_Click" />

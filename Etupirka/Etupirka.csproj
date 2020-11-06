@@ -156,8 +156,8 @@
     <Compile Include="Dialog\DisplaySettingsHelpDialog.xaml.cs">
       <DependentUpon>DisplaySettingsHelpDialog.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Dialog\GameTimeBarGraph.xaml.cs">
-      <DependentUpon>GameTimeBarGraph.xaml</DependentUpon>
+    <Compile Include="Dialog\GameComment.xaml.cs">
+      <DependentUpon>GameComment.xaml</DependentUpon>
     </Compile>
     <Compile Include="Dialog\GameTimeBarGraph2.xaml.cs">
       <DependentUpon>GameTimeBarGraph2.xaml</DependentUpon>
@@ -245,11 +245,11 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="Dialog\GamePropertyDialog.xaml">
+    <Page Include="Dialog\GameComment.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="Dialog\GameTimeBarGraph.xaml">
+    <Page Include="Dialog\GamePropertyDialog.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

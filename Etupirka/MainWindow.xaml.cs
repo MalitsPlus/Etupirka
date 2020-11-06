@@ -280,7 +280,7 @@ namespace Etupirka
 
             Process[] proc = Process.GetProcesses();
 
-            Dictionary<String, bool> dic = new Dictionary<string, bool>();
+            Dictionary<string, bool> dic = new Dictionary<string, bool>();
             foreach (Process p in proc) {
                 try {
                     string path = p.MainModule.FileName.ToLower();
@@ -893,6 +893,17 @@ namespace Etupirka
             }
         }
 
+        private void OpenComment_Click(object sender, RoutedEventArgs e) {
+            if (GameListView.SelectedItems.Count > 0) {
+                GameExecutionInfo i = (GameExecutionInfo)GameListView.SelectedItem;
+                Dialog.GameComment gc = new Dialog.GameComment(i);
+                gc.Owner = this;
+                if (gc.ShowDialog() == true) {
+                    db.UpdateGameComment(i);
+                }
+            }
+        }
+
         private void ShowApp_Click(object sender, RoutedEventArgs e) {
             this.Show();
             this.WindowState = WindowState.Normal;
@@ -980,7 +991,6 @@ namespace Etupirka
         }
 
         #endregion
-
     }
 
     #region Command
