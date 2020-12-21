@@ -20,6 +20,9 @@
             <Controls:MetroTabItem Header="一般" Controls:ControlsHelper.HeaderFontSize="20">
                 <Views:GeneralConfigView x:Name="GeneralView" />
             </Controls:MetroTabItem>
+            <Controls:MetroTabItem Header="スクショ" Controls:ControlsHelper.HeaderFontSize="20">
+                <Views:GeneralConfigView x:Name="ScreenshotView" />
+            </Controls:MetroTabItem>
             <Controls:MetroTabItem Header="データベース" Controls:ControlsHelper.HeaderFontSize="20">
                 <Views:DatabaseConfigView x:Name="DatabaseView" />
             </Controls:MetroTabItem>
