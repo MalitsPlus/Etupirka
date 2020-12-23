@@ -65,5 +65,14 @@
     <Setting Name="showAllGameInYearGraph" Type="System.Boolean" Scope="User">
       <Value Profile="(Default)">False</Value>
     </Setting>
+    <Setting Name="enableScreenShot" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">False</Value>
+    </Setting>
+    <Setting Name="screenShotSavePath" Type="System.String" Scope="User">
+      <Value Profile="(Default)" />
+    </Setting>
+    <Setting Name="fileName" Type="System.String" Scope="User">
+      <Value Profile="(Default)">%game%_scr###</Value>
+    </Setting>
   </Settings>
 </SettingsFile>

@@ -49,6 +49,9 @@ namespace Etupirka.Dialogs
             Properties.Settings.Default.showAllGameInYearGraph = GeneralView.ShowAllGameInYearGraph;
             Properties.Settings.Default.useOfflineESDatabase = DatabaseView.UseOfflineDatabase;
             Properties.Settings.Default.databaseSyncServer = DatabaseView.DatabaseSyncServer;
+            Properties.Settings.Default.screenShotSavePath = ScreenshotView.ScreenShotSavePath;
+            Properties.Settings.Default.fileName = ScreenshotView.FileName;
+            Properties.Settings.Default.enableScreenShot = ScreenshotView.EnableScreenShot;
             Properties.Settings.Default.Save();
             this.DialogResult = true;
         }

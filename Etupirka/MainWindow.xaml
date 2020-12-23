@@ -83,7 +83,6 @@
                 <MenuItem Header="リフレッシュ" Name="RefreshList" Click="RefreshList_Click"/>
             </MenuItem>
             <MenuItem   Header="ヘルプ" >
-                <MenuItem Header="更新をチェック" Name="CheckUpdate" Click="CheckUpdate_Click"/>
                 <MenuItem Header="バージョン情報" Name="VersionInfo" Click="VersionInfo_Click"/>
             </MenuItem>
         </Menu>

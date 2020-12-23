@@ -122,6 +122,8 @@ namespace Etupirka
             }
         }
 
+        private GameExecutionInfo currentFocused;
+        private GameExecutionInfo currentRunning;
 
         public StatusBarStatus StatusBarStat {
             get {
@@ -134,7 +136,9 @@ namespace Etupirka
         #endregion
 
         #region Hotkey
-        private HotKey _hotkey;
+        public HotKey _hotkeyWatchProc;
+        public HotKey _hotkeyErogeHelper;
+        public HotKey _hotkeyDoSceenShot;
         private void OnHotKeyHandler_WatchProc(HotKey hotKey) {
             if (Properties.Settings.Default.playVoice) {
                 if (WatchProc) {
@@ -151,6 +155,66 @@ namespace Etupirka
 
         private void OnHotKeyHandler_ErogeHelper(HotKey hotKey) {
             ErogeHelper = !ErogeHelper;
+        }
+
+        public void OnHotKeyHandler_DoSceenShot(HotKey hotKey) {
+            int width = (int)SystemParameters.PrimaryScreenWidth;
+            int height = (int)SystemParameters.PrimaryScreenHeight;
+            // create image
+            Bitmap image = new Bitmap(width, height);
+            Graphics imgGraphics = Graphics.FromImage(image);
+            // fullfill the canvas with black, otherwise RGB(0,0,0) will be dead pixels 
+            imgGraphics.Clear(System.Drawing.Color.Black);
+            // set the area
+            imgGraphics.CopyFromScreen(0, 0, 0, 0, new System.Drawing.Size(width, height));
+
+            string fileName = Settings.Default.fileName;
+            string folderPath = Settings.Default.screenShotSavePath;
+
+            if (currentFocused != null) {
+                folderPath += "\\" + currentFocused.Title;
+                fileName = fileName.Replace("%game%", currentFocused.Title);
+            } else if (currentRunning != null) {
+                folderPath += "\\" + currentRunning.Title;
+                fileName = fileName.Replace("%game%", currentRunning.Title);
+            } else {
+                folderPath += "\\" + "その他";
+                fileName = fileName.Replace("%game%", "その他");
+            }
+            
+            if (!Directory.Exists(folderPath)) {
+                Directory.CreateDirectory(folderPath);
+            }
+
+            string hatena = "";
+            int num = 3;
+            var matches = new Regex("#+").Match(fileName);
+            if (matches.Success) {
+                num = matches.Value.Length;
+                for (int i = 0; i < num; i++) {
+                    hatena += "?";
+                }
+                fileName = fileName.Replace(matches.Value, hatena);
+            } else {
+                hatena = "???";
+                fileName = fileName + hatena;
+            }
+            string formatter = "{0:D" + num + "}";
+
+            // check duplicate file name
+            string[] existFileNames = Directory.GetFiles(folderPath, fileName + ".png");
+
+            if (existFileNames.Length == 0) {
+                // if no files
+                image.Save(folderPath + "\\" + fileName.Replace(hatena, String.Format(formatter, 1)) + ".png", ImageFormat.Png);
+            } else {
+                // get the max num 
+                Array.Sort(existFileNames);
+                int lastNum = int.Parse(existFileNames[existFileNames.Length - 1].Substring(folderPath.Length + matches.Index + 1, num)) + 1;
+                image.Save(folderPath + "\\" + fileName.Replace(hatena, String.Format(formatter, lastNum)) + ".png", ImageFormat.Png);
+            }
+            image.Dispose();
+            imgGraphics.Dispose();
         }
 
         /*		private void OnHotKeyHandler_Screenshot(HotKey hotKey)
@@ -200,8 +264,11 @@ namespace Etupirka
 
             loadGridData(true);
 
-            _hotkey = new HotKey(Key.F9, KeyModifier.Alt, OnHotKeyHandler_WatchProc);
-            _hotkey = new HotKey(Key.F8, KeyModifier.Alt, OnHotKeyHandler_ErogeHelper);
+            _hotkeyWatchProc = new HotKey(Key.F9, KeyModifier.Alt, OnHotKeyHandler_WatchProc);
+            _hotkeyErogeHelper = new HotKey(Key.F8, KeyModifier.Alt, OnHotKeyHandler_ErogeHelper);
+            if (Settings.Default.enableScreenShot) {
+                _hotkeyDoSceenShot = new HotKey(Key.D, KeyModifier.Alt, OnHotKeyHandler_DoSceenShot);
+            }
 
             RegisterInStartup(Properties.Settings.Default.setStartUp);
             if (Properties.Settings.Default.disableGlowBrush) {
@@ -213,9 +280,8 @@ namespace Etupirka
             watchProcTimer.Interval = new TimeSpan(0, 0, Properties.Settings.Default.monitorInterval);
             watchProcTimer.Start();
 
-            if (Settings.Default.checkUpdate) {
-                Thread t = new Thread(doCheckUpdate);
-                t.Start();
+            if (String.IsNullOrEmpty(Settings.Default.screenShotSavePath)) {
+                Settings.Default.screenShotSavePath = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
             }
         }
 
@@ -243,21 +309,21 @@ namespace Etupirka
             GameListView.SelectedItem = null;
         }
 
-        private void doCheckUpdate() {
-            try {
-                string str = NetworkUtility.GetString("http://etupirka.halcyons.org/checkversion.php");
-                Version lastestVersion = new Version(str);
-                Version myVersion = new Version(FileVersionInfo.GetVersionInfo(System.Reflection.Assembly.GetExecutingAssembly().Location).FileVersion);
-                if (lastestVersion > myVersion) {
-                    if (MessageBox.Show("Version " + str + " が見つかりました、更新しますか？", "Etupirkaを更新する", MessageBoxButton.YesNo) == MessageBoxResult.Yes) {
-                        Process.Start("https://github.com/Aixile/Etupirka/releases");
-                    }
-                }
-            } catch {
+        //private void doCheckUpdate() {
+        //    try {
+        //        string str = NetworkUtility.GetString("http://etupirka.halcyons.org/checkversion.php");
+        //        Version lastestVersion = new Version(str);
+        //        Version myVersion = new Version(FileVersionInfo.GetVersionInfo(System.Reflection.Assembly.GetExecutingAssembly().Location).FileVersion);
+        //        if (lastestVersion > myVersion) {
+        //            if (MessageBox.Show("Version " + str + " が見つかりました、更新しますか？", "Etupirkaを更新する", MessageBoxButton.YesNo) == MessageBoxResult.Yes) {
+        //                Process.Start("https://github.com/Aixile/Etupirka/releases");
+        //            }
+        //        }
+        //    } catch {
 
-            }
+        //    }
 
-        }
+        //}
 
         private void UpdateStatus(int time = 0) {
             IntPtr actWin = Utility.GetForegroundWindow();
@@ -298,6 +364,7 @@ namespace Etupirka
             string trayTipText = "Etupirka Version " + FileVersionInfo.GetVersionInfo(System.Reflection.Assembly.GetExecutingAssembly().Location).FileVersion;
 
             GameExecutionInfo currentGame = null;
+            GameExecutionInfo currentUnfocused = null;
             foreach (GameExecutionInfo i in items) {
                 bool running = false;
                 if (i.UpdateStatus2(dic, ref running, time))
@@ -312,17 +379,21 @@ namespace Etupirka
                     if (i.Status == ProcStat.Focused) {
                         play_flag = true;
                         currentGame = i;
-
                         if (Properties.Settings.Default.hideListWhenPlaying) {
                             ErogeHelper = true;
                         }
-                    }
+                    } 
+                } else if (i.Status == ProcStat.Unfocused) {
+                    currentUnfocused = i;
                 }
                 System.Console.WriteLine(running);
                 if (running) {
                     trayTipText += "\n" + i.Title + " : " + i.TotalPlayTimeString;
                 }
             }
+
+            currentFocused = currentGame;
+            currentRunning = currentUnfocused;
 
             dic.Clear();
 
@@ -528,7 +599,6 @@ namespace Etupirka
                 }
 
             }
-
             base.OnClosing(e);
         }
 
@@ -614,6 +684,7 @@ namespace Etupirka
             gd.Owner = this;
             int mi = Properties.Settings.Default.monitorInterval;
             bool watchProc = Properties.Settings.Default.watchProcess;
+            bool enableScr = Properties.Settings.Default.enableScreenShot;
             if (gd.ShowDialog() == true) {
                 GameListView.Items.Refresh();
                 RegisterInStartup(Properties.Settings.Default.setStartUp);
@@ -621,7 +692,16 @@ namespace Etupirka
                 if (watchProc != watchProc_a) {
                     WatchProc = watchProc_a;
                 }
-
+                bool enableScr_a = Properties.Settings.Default.enableScreenShot;
+                if (enableScr ^ enableScr_a) {
+                    if (enableScr_a) {
+                        _hotkeyDoSceenShot = new HotKey(Key.D, KeyModifier.Alt, OnHotKeyHandler_DoSceenShot);
+                    } else {
+                        if (_hotkeyDoSceenShot != null) {
+                            _hotkeyDoSceenShot.Unregister();
+                        }
+                    }
+                }
                 if (mi != Properties.Settings.Default.monitorInterval) {
                     watchProcTimer.Stop();
                     watchProcTimer.Interval = new TimeSpan(0, 0, Properties.Settings.Default.monitorInterval);
@@ -801,11 +881,6 @@ namespace Etupirka
             showMessage("バージョン情報", "Version " + FileVersionInfo.GetVersionInfo(System.Reflection.Assembly.GetExecutingAssembly().Location).FileVersion +
                 " By Aixile (@namaniku0).");
 
-        }
-
-        private void CheckUpdate_Click(object sender, RoutedEventArgs e) {
-            Thread t = new Thread(doCheckUpdate);
-            t.Start();
         }
 
         private void RefreshList_Click(object sender, RoutedEventArgs e) {
