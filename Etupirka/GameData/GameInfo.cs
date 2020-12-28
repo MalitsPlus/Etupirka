@@ -98,12 +98,12 @@ namespace Etupirka
             }
         }
         public async Task updateInfoFromES() {
-            if (Properties.Settings.Default.useOfflineESDatabase) {
-                updateInfoFromESOffline();
-            } else {
-                await updateInfoFromESOnline();
-            }
-
+            //if (Properties.Settings.Default.useOfflineESDatabase) {
+            //    updateInfoFromESOffline();
+            //} else {
+            //    await updateInfoFromESOnline();
+            //}
+            await updateInfoFromESOnline();
         }
 
         public void updateInfoFromESOffline() {

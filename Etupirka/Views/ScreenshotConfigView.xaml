@@ -12,8 +12,7 @@
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="Auto" />
@@ -29,5 +28,14 @@
         </Button>
         <Label Margin="2" Grid.Row="2" Grid.Column="0">ファイル名</Label>
         <TextBox Margin="2" Grid.Row="2" Grid.Column="1" TextAlignment="Right" Text="{Binding FileName,UpdateSourceTrigger=PropertyChanged}" ></TextBox>
+        <TextBlock Margin="2" Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="3" TextWrapping="WrapWithOverflow" >
+            <LineBreak />
+            "Alt + D" を押せばいつでもスクショを撮れます。<LineBreak /><LineBreak />
+            保存場所は指定のパス + ゲームタイトルフォルダー（自動作成）の中。<LineBreak /><LineBreak />
+            ファイル名の "%game%" はゲームタイトルに、"#" はその数の分だけ数字カウントに置き換えられます。<LineBreak /><LineBreak />
+            例：ゲームタイトルは「Untitiled」の場合<LineBreak />
+            %game%_scr### = Untitiled_scr001<LineBreak />
+            スクショ%game%## = スクショUntitiled01
+        </TextBlock>
     </Grid>
 </UserControl>

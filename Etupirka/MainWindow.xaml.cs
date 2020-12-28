@@ -171,6 +171,7 @@ namespace Etupirka
             string fileName = Settings.Default.fileName;
             string folderPath = Settings.Default.screenShotSavePath;
 
+            // priority: Focused > Running(Random) > Others 
             if (currentFocused != null) {
                 folderPath += "\\" + currentFocused.Title;
                 fileName = fileName.Replace("%game%", currentFocused.Title);
@@ -878,8 +879,10 @@ namespace Etupirka
         }
         private void VersionInfo_Click(object sender, RoutedEventArgs e) {
 
-            showMessage("バージョン情報", "Version " + FileVersionInfo.GetVersionInfo(System.Reflection.Assembly.GetExecutingAssembly().Location).FileVersion +
-                " By Aixile (@namaniku0).");
+            showMessage("バージョン情報", "Version " + FileVersionInfo.GetVersionInfo(System.Reflection.Assembly.GetExecutingAssembly().Location).ProductVersion +
+                "\r\nOriginal Developed By Aixile (@namaniku0)."
+                + "\r\nModified By Vibbit (@L8102259)."
+                );
 
         }
 
@@ -1046,22 +1049,63 @@ namespace Etupirka
         private async void TryGetGameInfoOnline_Click(object sender, RoutedEventArgs e) {
 
             GameExecutionInfo thisGame = (GameExecutionInfo)GameListView.SelectedItem;
-            var searchedList = await searchGameFromES(thisGame);
+
+            var progressDialog = await this.ShowProgressAsync("通信中", "ESからゲームデータを取得しています...", true);
+            await TaskEx.Delay(500);
+            if (progressDialog.IsCanceled) {
+                await progressDialog.CloseAsync();
+                await this.ShowMessageAsync("通信中", "データの取得がキャンセルされました");
+                return;
+            }
+            bool result1 = false;
+            List<GameInfo> searchedList = new List<GameInfo>();
+            try {
+                searchedList = await searchGameFromES(thisGame);
+                result1 = true;
+            } catch (Exception ex) {
+                Console.WriteLine(ex.Message);
+            }
+
+            await progressDialog.CloseAsync();
+
+            if (!result1) {
+                await this.ShowMessageAsync("通信中", "データの取得が失敗しました");
+                return;
+            } 
 
             Dialog.GameInfoDialog td = new Dialog.GameInfoDialog(searchedList);
 
             td.Owner = this;
             if (td.ShowDialog() == true) {
                 thisGame.ErogameScapeID = td.SelectedGameInfo.ErogameScapeID;
-                await thisGame.updateInfoFromES();
 
-                //thisGame.Title = td.SelectedGameInfo.Title;
-                //thisGame.Brand = td.SelectedGameInfo.Brand;
-                //thisGame.SaleDay = td.SelectedGameInfo.SaleDay;
-                //thisGame.IsNukige = false;
+                var controller = await this.ShowProgressAsync("通信中", "ESからゲームデータを取得しています...", true);
+                await TaskEx.Delay(1000);
 
-                UpdateStatus();
-                db.UpdateGameInfoAndExec(thisGame);
+                if (controller.IsCanceled) {
+                    await controller.CloseAsync();
+                    await this.ShowMessageAsync("通信中", "データの取得がキャンセルされました");
+                    return;
+                }
+
+                bool result = false;
+
+                try {
+                    await thisGame.updateInfoFromES();
+                    UpdateStatus();
+                    db.UpdateGameInfoAndExec(thisGame);
+                    result = true;
+                } catch(Exception ex) {
+                    Console.WriteLine(ex.Message);
+                }
+
+                await controller.CloseAsync();
+
+                if (result) {
+                    await this.ShowMessageAsync("通信中", "データの取得が成功しました");
+                } else {
+                    await this.ShowMessageAsync("通信中", "データの取得が失敗しました");
+                }
             }
         }
 
