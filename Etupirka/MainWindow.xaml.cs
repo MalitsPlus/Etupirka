@@ -1046,17 +1046,27 @@ namespace Etupirka
 
         }
 
+        private delegate void RunOnUiThread();
         private async void TryGetGameInfoOnline_Click(object sender, RoutedEventArgs e) {
 
             GameExecutionInfo thisGame = (GameExecutionInfo)GameListView.SelectedItem;
 
             var progressDialog = await this.ShowProgressAsync("通信中", "ESからゲームデータを取得しています...", true);
-            await TaskEx.Delay(500);
-            if (progressDialog.IsCanceled) {
-                await progressDialog.CloseAsync();
-                await this.ShowMessageAsync("通信中", "データの取得がキャンセルされました");
-                return;
-            }
+
+            new Thread(() => {
+                while (progressDialog.IsOpen) {
+                    if (progressDialog.IsCanceled) {
+                        RunOnUiThread runOnUiThread = new RunOnUiThread(async () => {
+                            await progressDialog.CloseAsync();
+                            await this.ShowMessageAsync("キャンセル", "通信がキャンセルされました");
+                        });
+                        this.Dispatcher.Invoke(runOnUiThread);
+                        break;
+                    }
+                    Thread.Sleep(500);
+                }
+            }).Start();
+
             bool result1 = false;
             List<GameInfo> searchedList = new List<GameInfo>();
             try {
@@ -1064,6 +1074,10 @@ namespace Etupirka
                 result1 = true;
             } catch (Exception ex) {
                 Console.WriteLine(ex.Message);
+            }
+
+            if (progressDialog.IsCanceled) {
+                return;
             }
 
             await progressDialog.CloseAsync();
@@ -1080,13 +1094,20 @@ namespace Etupirka
                 thisGame.ErogameScapeID = td.SelectedGameInfo.ErogameScapeID;
 
                 var controller = await this.ShowProgressAsync("通信中", "ESからゲームデータを取得しています...", true);
-                await TaskEx.Delay(1000);
 
-                if (controller.IsCanceled) {
-                    await controller.CloseAsync();
-                    await this.ShowMessageAsync("通信中", "データの取得がキャンセルされました");
-                    return;
-                }
+                new Thread(() => {
+                    while (controller.IsOpen) {
+                        if (controller.IsCanceled) {
+                            RunOnUiThread runOnUiThread = new RunOnUiThread(async () => {
+                                await controller.CloseAsync();
+                                await this.ShowMessageAsync("キャンセル", "通信がキャンセルされました");
+                            });
+                            this.Dispatcher.Invoke(runOnUiThread);
+                            break;
+                        }
+                        Thread.Sleep(500);
+                    }
+                }).Start();
 
                 bool result = false;
 
@@ -1099,12 +1120,13 @@ namespace Etupirka
                     Console.WriteLine(ex.Message);
                 }
 
-                await controller.CloseAsync();
-
-                if (result) {
-                    await this.ShowMessageAsync("通信中", "データの取得が成功しました");
-                } else {
-                    await this.ShowMessageAsync("通信中", "データの取得が失敗しました");
+                if (!controller.IsCanceled) {
+                    await controller.CloseAsync();
+                    if (result) {
+                        await this.ShowMessageAsync("通信中", "データの取得が成功しました");
+                    } else {
+                        await this.ShowMessageAsync("通信中", "データの取得が失敗しました");
+                    }
                 }
             }
         }
