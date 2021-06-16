@@ -26,6 +26,7 @@ namespace Etupirka.Dialog
 		{
 			d = DateTime.ParseExact(dat, "yyyy-MM-dd", CultureInfo.InvariantCulture);
 			time = val;
+			PlayTime = Math.Round((Convert.ToDouble(val) / 3600), 2);
 		}
 		public DateTime d { get; set; }
 		public string DayString
@@ -50,6 +51,7 @@ namespace Etupirka.Dialog
 		}
 
 		public int time { get; set; }
+		
 		public string TimeString
 		{
 			get{
@@ -58,6 +60,18 @@ namespace Etupirka.Dialog
 				int h = m / 60;
 				m %= 60;
 				return h + @"時間" + m + @"分" + s + @"秒";
+			}
+		}
+
+		public string Description {
+			get {
+				return "プレイ時間(hours)";
+			}
+		}
+		public double PlayTime { get; private set; }
+		public string MonthDayString {
+			get {
+				return d.ToString("M/d(ddd)", new CultureInfo("ja-JP"));
 			}
 		}
 	}

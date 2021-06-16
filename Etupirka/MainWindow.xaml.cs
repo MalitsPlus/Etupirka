@@ -922,7 +922,7 @@ namespace Etupirka
             if (GameListView.SelectedItems.Count > 0) {
                 GameExecutionInfo i = (GameExecutionInfo)GameListView.SelectedItem;
                 List<TimeSummary> t = db.QueryGamePlayTime(i.UID);
-                Dialog.GameTimeStatisticDialog td = new Dialog.GameTimeStatisticDialog(t);
+                Dialog.GameTimeStatisticDialog td = new Dialog.GameTimeStatisticDialog(t, i.Title);
 
                 td.Owner = this;
                 if (td.ShowDialog() == true) {
