@@ -160,18 +160,18 @@ namespace Etupirka
         public void OnHotKeyHandler_DoSceenShot(HotKey hotKey) {
             int width = (int)SystemParameters.PrimaryScreenWidth;
             int height = (int)SystemParameters.PrimaryScreenHeight;
-            // create image
+            // Creates an image
             Bitmap image = new Bitmap(width, height);
             Graphics imgGraphics = Graphics.FromImage(image);
-            // fullfill the canvas with black, otherwise RGB(0,0,0) will be dead pixels 
+            // Fullfills the canvas with pure black, otherwise RGB(0,0,0) will be a dead pixel 
             imgGraphics.Clear(System.Drawing.Color.Black);
-            // set the area
+            // Sets the area
             imgGraphics.CopyFromScreen(0, 0, 0, 0, new System.Drawing.Size(width, height));
 
             string fileName = Settings.Default.fileName;
             string folderPath = Settings.Default.screenShotSavePath;
 
-            // priority: Focused > Running(Random) > Others 
+            // Priority: Focused > Running(Random) > Others 
             if (currentFocused != null) {
                 folderPath += "\\" + currentFocused.Title;
                 fileName = fileName.Replace("%game%", currentFocused.Title);
@@ -202,7 +202,7 @@ namespace Etupirka
             }
             string formatter = "{0:D" + num + "}";
 
-            // check duplicate file name
+            // Check duplicate file name
             string[] existFileNames = Directory.GetFiles(folderPath, fileName + ".png");
 
             if (existFileNames.Length == 0) {
@@ -240,6 +240,8 @@ namespace Etupirka
 
         private System.Windows.Threading.DispatcherTimer watchProcTimer;
 
+        private ProcessInfoCache processInfoCache = new ProcessInfoCache();
+
         private DBManager db;
 
         public MainWindow() {
@@ -265,8 +267,8 @@ namespace Etupirka
 
             loadGridData(true);
 
-            _hotkeyWatchProc = new HotKey(Key.F9, KeyModifier.Alt, OnHotKeyHandler_WatchProc);
-            _hotkeyErogeHelper = new HotKey(Key.F8, KeyModifier.Alt, OnHotKeyHandler_ErogeHelper);
+            //_hotkeyWatchProc = new HotKey(Key.F9, KeyModifier.Alt, OnHotKeyHandler_WatchProc);
+            //_hotkeyErogeHelper = new HotKey(Key.F8, KeyModifier.Alt, OnHotKeyHandler_ErogeHelper);
             if (Settings.Default.enableScreenShot) {
                 _hotkeyDoSceenShot = new HotKey(Key.D, KeyModifier.Alt, OnHotKeyHandler_DoSceenShot);
             }
@@ -289,7 +291,7 @@ namespace Etupirka
         #region Function
         private async void loadGridData(bool isInit) {
             GameListView.ItemsSource = null;
-            GameListView.ItemsSource = await TaskEx.Run(() => {
+            GameListView.ItemsSource = await Task.Run(() => {
                 if (isInit) {
                     items = new ObservableCollection<GameExecutionInfo>();
                     db.LoadGame(items);
@@ -326,6 +328,10 @@ namespace Etupirka
 
         //}
 
+        /// <summary>
+        /// This method shall be called async in every certain seconds, or be called sync in some user actions.
+        /// </summary>
+        /// <param name="time"></param>
         private void UpdateStatus(int time = 0) {
             IntPtr actWin = Utility.GetForegroundWindow();
             int calcID;
@@ -343,21 +349,27 @@ namespace Etupirka
             System.Console.WriteLine(calcID);
             bool play_flag = false;
 
-            // Check current processes in background thread 
-
             Process[] proc = Process.GetProcesses();
 
             Dictionary<string, bool> dic = new Dictionary<string, bool>();
-            foreach (Process p in proc) {
-                try {
-                    string path = p.MainModule.FileName.ToLower();
-                    if (dic.ContainsKey(path)) {
-                        dic[path] |= p.Id == calcID;
-                    } else {
-                        dic.Add(p.MainModule.FileName.ToLower(), p.Id == calcID);
+
+
+            using (var scopedAccess = processInfoCache.scopedAccess()) {
+                foreach (Process p in proc) {
+                    try {
+                        string path = processInfoCache.getProcessPath(p);
+                        if (path == "") {
+                            continue;
+                        }
+                        bool isForeground = p.Id == calcID;
+                        if (dic.ContainsKey(path)) {
+                            dic[path] |= isForeground;
+                        } else {
+                            dic[path] = isForeground;
+                        }
+                    } catch (Exception e) {
+                        // Console.WriteLine(e);
                     }
-                } catch (Exception e) {
-                    Console.WriteLine(e);
                 }
             }
 
@@ -831,7 +843,7 @@ namespace Etupirka
             try {
                 var controller = await this.ShowProgressAsync("更新しています", "Initializing...");
                 controller.SetCancelable(true);
-                await TaskEx.Delay(1000);
+                await Task.Delay(1000);
 
                 controller.SetMessage("Downloading...");
                 string url = Properties.Settings.Default.databaseSyncServer;
@@ -841,7 +853,7 @@ namespace Etupirka
                     await this.ShowMessageAsync("データベースを更新する", "失敗しました");
                     return;
                 }
-                var data = await TaskEx.Run(() => { return NetworkUtility.GetData(url); });
+                var data = await Task.Run(() => { return NetworkUtility.GetData(url); });
                 if (controller.IsCanceled) {
                     await controller.CloseAsync();
                     await this.ShowMessageAsync("データベースを更新する", "失敗しました");
@@ -849,7 +861,7 @@ namespace Etupirka
                 }
 
                 controller.SetMessage("Decompressing...");
-                var s = await TaskEx.Run(() => { return Encoding.UTF8.GetString(Utility.Decompress(data)); });
+                var s = await Task.Run(() => { return Encoding.UTF8.GetString(Utility.Decompress(data)); });
                 if (controller.IsCanceled) {
                     await controller.CloseAsync();
                     await this.ShowMessageAsync("データベースを更新する", "失敗しました");
@@ -857,7 +869,7 @@ namespace Etupirka
                 }
 
                 controller.SetMessage("Updating database...");
-                bool re = await TaskEx.Run(() => { return Utility.im.update(s.Split('\n')); });
+                bool re = await Task.Run(() => { return Utility.im.update(s.Split('\n')); });
                 await controller.CloseAsync();
                 if (re) {
                     await this.ShowMessageAsync("データベースを更新する", "成功しました");
