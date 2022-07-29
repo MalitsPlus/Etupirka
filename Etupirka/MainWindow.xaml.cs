@@ -158,8 +158,10 @@ namespace Etupirka
         }
 
         public void OnHotKeyHandler_DoSceenShot(HotKey hotKey) {
-            int width = (int)SystemParameters.PrimaryScreenWidth;
-            int height = (int)SystemParameters.PrimaryScreenHeight;
+            int width = PrimaryScreen.DESKTOP.Width;
+            int height = PrimaryScreen.DESKTOP.Height;
+            //int width = (int)SystemParameters.PrimaryScreenWidth;
+            //int height = (int)SystemParameters.PrimaryScreenHeight;
             // Creates an image
             Bitmap image = new Bitmap(width, height);
             Graphics imgGraphics = Graphics.FromImage(image);
